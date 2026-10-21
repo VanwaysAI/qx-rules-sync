@@ -1,0 +1,40 @@
+{
+  "_comment": "死链修复表。replace: 原 URL -> 替代 URL（会被下载并镜像）。drop: 明确放弃，不再探测（直接注释）。",
+  "_note": "写入这里的替代源必须是能 200 返回的，sync.py 仍会实测一次，失败则回落到注释。",
+
+  "replace": {
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/cnftp.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cnftp.js",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/fenbi.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fenbi.js",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/ithome.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ithome/ithome.js",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/break/kuwo.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/myBlockAds.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/weibo.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js",
+    "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly_json.js":
+      "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js",
+    "https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Cainiao.conf":
+      "https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf",
+    "https://raw.githubusercontent.com/Maasea/sgmodule/master/YoutubeAds.sgmodule":
+      "https://raw.githubusercontent.com/Maasea/sgmodule/master/YouTube.Enhance.sgmodule",
+    "https://raw.githubusercontent.com/Peng-YM/Sub-Store/master/backend/dist/cron-sync-artifacts.min.js":
+      "https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js"
+  },
+
+  "drop": [
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/amap.snippet",
+    "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/zhihu.js",
+    "https://raw.githubusercontent.com/WeiRen0/Scripts/main/ZHVIP.js",
+    "https://raw.githubusercontent.com/WeiRen0/Scripts/main/wxds.js",
+    "https://raw.githubusercontent.com/chouchoui/QuanX/master/Scripts/testflight/Auto_join_TF.js",
+    "https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Script/JD/ClCart.js",
+    "https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Icon/Test/App-Store.PNG",
+    "https://qxnav.top/rules/QuantumultX/img/China.png",
+    "https://service.2ti.st/QuanX/Script/jd_tb_price/main.js",
+    "https://api.343.re/freedom/rule/quanx/script/ipinfo.js"
+  ]
+}

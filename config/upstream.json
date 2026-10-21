@@ -1,0 +1,13 @@
+{
+  "_comment": "上游配置源 + 本仓库地址。换上游只改这里。",
+  "profile_url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf",
+  "raw_base": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/",
+  "mirror_sections": ["filter_remote", "rewrite_remote"],
+  "script_sections": ["task_local", "rewrite_local", "http_backend"],
+  "mirror_scripts": true,
+  "mirror_icons": false,
+  "probe": {
+    "timeout": 25,
+    "retries": 2
+  }
+}

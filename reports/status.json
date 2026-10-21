@@ -1,0 +1,894 @@
+{
+  "generated_at": "2026-10-21T09:53:10.921640+08:00",
+  "upstream": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf",
+  "summary": {
+    "total": 88,
+    "alive": 81,
+    "dead": 7,
+    "replaced": 10,
+    "newly_dead": 7
+  },
+  "items": [
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/amap.snippet",
+      "kind": "remote",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/zhihu.js",
+      "kind": "script",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Script/JD/ClCart.js",
+      "kind": "script",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WeiRen0/Scripts/main/ZHVIP.js",
+      "kind": "remote",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WeiRen0/Scripts/main/wxds.js",
+      "kind": "remote",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_remove_ads.js",
+      "kind": "script",
+      "status": 404,
+      "action": "drop",
+      "final": null,
+      "note": "404 不存在"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/chouchoui/QuanX/master/Scripts/testflight/Auto_join_TF.js",
+      "kind": "script",
+      "status": null,
+      "action": "drop",
+      "final": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://github.com/Moli-X/Resources/raw/main/Script/Nicegram.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/Moli-X/Resources/raw/main/Script/Nicegram.js",
+      "src": "https://github.com/Moli-X/Resources/raw/main/Script/Nicegram.js",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/Moli-X/Resources/raw/main/Script/Xiaohongshu.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/Moli-X/Resources/raw/main/Script/Xiaohongshu.js",
+      "src": "https://github.com/Moli-X/Resources/raw/main/Script/Xiaohongshu.js",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/NobyDa/Script/raw/master/Surge/WeChat.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/NobyDa/Script/raw/master/Surge/WeChat.list",
+      "src": "https://github.com/NobyDa/Script/raw/master/Surge/WeChat.list",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Cainiao.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf",
+      "src": "https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf",
+      "note": "已替换 → /ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf"
+    },
+    {
+      "url": "https://github.com/ddgksf2013/Scripts/raw/master/douban.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/ddgksf2013/Scripts/raw/master/douban.js",
+      "src": "https://github.com/ddgksf2013/Scripts/raw/master/douban.js",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/ddgksf2013/Scripts/raw/master/pornhub.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/ddgksf2013/Scripts/raw/master/pornhub.js",
+      "src": "https://github.com/ddgksf2013/Scripts/raw/master/pornhub.js",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js",
+      "src": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js",
+      "note": ""
+    },
+    {
+      "url": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js",
+      "src": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ChuheGit/1/main/Script/jd_scripts/jd_bean_change.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ChuheGit/1/main/Script/jd_scripts/jd_bean_change.js",
+      "src": "https://raw.githubusercontent.com/ChuheGit/1/main/Script/jd_scripts/jd_bean_change.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ChuheGit/1/main/Script/jd_scripts/jd_unsubscribe.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ChuheGit/1/main/Script/jd_scripts/jd_unsubscribe.js",
+      "src": "https://raw.githubusercontent.com/ChuheGit/1/main/Script/jd_scripts/jd_unsubscribe.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/I-am-R-E/Functional-Store-Hub/Master/NodeLinkCheck/Script/NodeLinkCheck.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/I-am-R-E/Functional-Store-Hub/Master/NodeLinkCheck/Script/NodeLinkCheck.js",
+      "src": "https://raw.githubusercontent.com/I-am-R-E/Functional-Store-Hub/Master/NodeLinkCheck/Script/NodeLinkCheck.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/I-am-R-E/QuantumultX/main/JavaScript/DouBan.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/I-am-R-E/QuantumultX/main/JavaScript/DouBan.js",
+      "src": "https://raw.githubusercontent.com/I-am-R-E/QuantumultX/main/JavaScript/DouBan.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/I-am-R-E/QuantumultX/main/TaskLocal/NeteaseMusicUnlockCheck.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/I-am-R-E/QuantumultX/main/TaskLocal/NeteaseMusicUnlockCheck.js",
+      "src": "https://raw.githubusercontent.com/I-am-R-E/QuantumultX/main/TaskLocal/NeteaseMusicUnlockCheck.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/nf-ui-check.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/KOP-XIAO/QuantumultX/master/Scripts/nf-ui-check.js",
+      "src": "https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/nf-ui-check.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/ytb-ui-check.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/KOP-XIAO/QuantumultX/master/Scripts/ytb-ui-check.js",
+      "src": "https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/ytb-ui-check.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/YoutubeAds.sgmodule",
+      "kind": "remote",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Maasea/sgmodule/master/YouTube.Enhance.sgmodule",
+      "src": "https://raw.githubusercontent.com/Maasea/sgmodule/master/YouTube.Enhance.sgmodule",
+      "note": "已替换 → /Maasea/sgmodule/master/YouTube.Enhance.sgmodule"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/ADBlack.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Filter/ADBlack.list",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/ADBlack.list",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/Mainland.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Filter/Mainland.list",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/Mainland.list",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/Overseas.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Filter/Overseas.list",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/Overseas.list",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/YouTube.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Filter/YouTube.list",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Filter/YouTube.list",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/ADBlock.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/ADBlock.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/ADBlock.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Collections.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/Collections.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Collections.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Cookie.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/Cookie.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Cookie.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Search.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/Search.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/Search.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/TikTok/TikTok-US.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/TikTok/TikTok-US.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/TikTok/TikTok-US.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/XHS.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Rewrite/XHS.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/XHS.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/AD_Bilibili.conf",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/Bilibili/AD_Bilibili.conf",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/AD_Bilibili.conf",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/TPBilibili.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/Bilibili/TPBilibili.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/TPBilibili.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/ZLBilibili.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/Bilibili/ZLBilibili.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/ZLBilibili.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/ZMBilibili.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/Bilibili/ZMBilibili.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/ZMBilibili.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/bilibili_json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/Bilibili/bilibili_json.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/Bilibili/bilibili_json.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/MTxiuxiu/MTxiuxiu.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/MTxiuxiu/MTxiuxiu.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/MTxiuxiu/MTxiuxiu.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/MTxiuxiu/MeiTu.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Moli-X/Resources/main/Script/MTxiuxiu/MeiTu.js",
+      "src": "https://raw.githubusercontent.com/Moli-X/Resources/main/Script/MTxiuxiu/MeiTu.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Neurogram-R/Quantumult-X/main/Dualsub.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Neurogram-R/Quantumult-X/main/Dualsub.js",
+      "src": "https://raw.githubusercontent.com/Neurogram-R/Quantumult-X/main/Dualsub.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/Bahamut/BahamutAnimeAds.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/NobyDa/Script/master/Bahamut/BahamutAnimeAds.js",
+      "src": "https://raw.githubusercontent.com/NobyDa/Script/master/Bahamut/BahamutAnimeAds.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js",
+      "src": "https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/xjsp.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/NobyDa/Script/master/QuantumultX/File/xjsp.js",
+      "src": "https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/xjsp.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/TestFlight/TestFlightAccount.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/NobyDa/Script/master/TestFlight/TestFlightAccount.js",
+      "src": "https://raw.githubusercontent.com/NobyDa/Script/master/TestFlight/TestFlightAccount.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Peng-YM/Sub-Store/master/backend/dist/cron-sync-artifacts.min.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js",
+      "src": "https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js",
+      "note": "已替换 → /sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/break/kuwo.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/cnftp.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/cnftp.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cnftp.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/cnftp.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/fenbi.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/fenbi.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fenbi.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/fenbi.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/ithome.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/ithome/ithome.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ithome/ithome.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/ithome/ithome.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/myBlockAds.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/myBlockAds.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/weibo.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/adsense.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/adsense.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/adsense.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/qidian.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/qidian.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/qidian.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/qq-news.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/qq-news.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/qq-news.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/spotify-json.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-json.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-proto.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/spotify-proto.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-proto.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/tieba-json.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/tieba-proto.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/vgtime.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/js/vgtime.js",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/js/vgtime.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/app2smile/rules/master/module/youtube.sgmodule",
+      "src": "https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/chavyleung/scripts/master/box/chavy.boxjs.js",
+      "src": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.httpbackend.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.httpbackend.js",
+      "src": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.httpbackend.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ddgksf2013/Scripts/master/amdc.js",
+      "src": "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/cainiao_json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ddgksf2013/Scripts/master/cainiao_json.js",
+      "src": "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/cainiao_json.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/dompling/Script/master/jd/jd_cookie_search.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/dompling/Script/master/jd/jd_cookie_search.js",
+      "src": "https://raw.githubusercontent.com/dompling/Script/master/jd/jd_cookie_search.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js",
+      "src": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js",
+      "src": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/scripts/Flightradar24.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/QuantumultX/scripts/Flightradar24.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/scripts/Flightradar24.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/51card.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/51card.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/51card.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/555Ad.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/555Ad.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/555Ad.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/amdc.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/amdc.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/amdc.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/coolapk.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/coolapk.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/coolapk.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fly.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/fly.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fly.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/jingxiAd.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/jingxiAd.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/jingxiAd.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/quark.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/quark.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/quark.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/reddit.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/reddit.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/reddit.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/rrtv_json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/rrtv_json.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/rrtv_json.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soda.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/soda.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soda.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soul/soul_ads.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/soul/soul_ads.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soul/soul_ads.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/stay.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/stay.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/stay.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xiaotucc.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/xiaotucc.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xiaotucc.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly_json.js",
+      "kind": "script",
+      "status": 200,
+      "action": "replaced",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js",
+      "note": "已替换 → /fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/id77/QuantumultX/master/task/jdWuLiu.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/id77/QuantumultX/master/task/jdWuLiu.js",
+      "src": "https://raw.githubusercontent.com/id77/QuantumultX/master/task/jdWuLiu.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Script/master/js/12306.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/kokoryh/Script/master/js/12306.js",
+      "src": "https://raw.githubusercontent.com/kokoryh/Script/master/js/12306.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/sub-store-org/Sub-Store/master/scripts/revert.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/sub-store-org/Sub-Store/master/scripts/revert.js",
+      "src": "https://raw.githubusercontent.com/sub-store-org/Sub-Store/master/scripts/revert.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/unknowntokyo/surge-list/master/X/dns-clear-cache.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/unknowntokyo/surge-list/master/X/dns-clear-cache.js",
+      "src": "https://raw.githubusercontent.com/unknowntokyo/surge-list/master/X/dns-clear-cache.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zZPiglet/Task/master/asset/UnblockURLinWeChat.js",
+      "kind": "script",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/zZPiglet/Task/master/asset/UnblockURLinWeChat.js",
+      "src": "https://raw.githubusercontent.com/zZPiglet/Task/master/asset/UnblockURLinWeChat.js",
+      "note": ""
+    }
+  ],
+  "replaced": [
+    {
+      "from": "https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Cainiao.conf",
+      "to": "https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/Maasea/sgmodule/master/YoutubeAds.sgmodule",
+      "to": "https://raw.githubusercontent.com/Maasea/sgmodule/master/YouTube.Enhance.sgmodule",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/Maasea/sgmodule/master/YouTube.Enhance.sgmodule"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/Peng-YM/Sub-Store/master/backend/dist/cron-sync-artifacts.min.js",
+      "to": "https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/cnftp.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cnftp.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/cnftp.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/fenbi.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fenbi.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/fenbi.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/ithome.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ithome/ithome.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/ithome/ithome.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/myBlockAds.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/myBlockAds.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/break/kuwo.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/weibo.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js"
+    },
+    {
+      "from": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly_json.js",
+      "to": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js",
+      "mirror": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js"
+    }
+  ],
+  "dropped": [
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/amap.snippet",
+      "kind": "remote",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WeiRen0/Scripts/main/ZHVIP.js",
+      "kind": "remote",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WeiRen0/Scripts/main/wxds.js",
+      "kind": "remote",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/chouchoui/QuanX/master/Scripts/testflight/Auto_join_TF.js",
+      "kind": "script",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Script/JD/ClCart.js",
+      "kind": "script",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_remove_ads.js",
+      "kind": "script",
+      "status": 404,
+      "note": "404 不存在"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/zhihu.js",
+      "kind": "script",
+      "status": null,
+      "note": "在 drop 名单（上游仓库已删除/封禁）"
+    }
+  ]
+}

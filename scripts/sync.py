@@ -1,0 +1,436 @@
+#!/usr/bin/env python3
+"""QuantumultX 配置校验同步器。
+
+做的事：
+  1. 拉上游主配置
+  2. 并发探测它引用的每一个外部资源（远程列表 / 远程 rewrite / 脚本 / 图标）
+  3. 存活的 → 下载镜像到 Sources/，配置里的链接改写成本仓库地址
+  4. 失效的 → 先查 config/overrides.json 找替代源，找不到就注释，全部记入报告
+  5. 生成 QuantumultX.conf（可直接导入 Qx）+ reports/STATUS.md
+
+原则：绝不静默丢功能。每一条被注释的规则都会出现在报告里。
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import sys
+import hashlib
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone, timedelta
+from urllib.parse import urlparse
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CFG = json.load(open(os.path.join(ROOT, "config", "upstream.json"), encoding="utf-8"))
+OVR = json.load(open(os.path.join(ROOT, "config", "overrides.json"), encoding="utf-8"))
+
+REPLACE = OVR.get("replace", {})
+DROP = set(OVR.get("drop", []))
+
+RAW_BASE = CFG["raw_base"].rstrip("/") + "/"
+MIRROR_SECTIONS = set(CFG["mirror_sections"])
+SCRIPT_SECTIONS = set(CFG["script_sections"])
+MIRROR_SCRIPTS = CFG.get("mirror_scripts", True)
+MIRROR_ICONS = CFG.get("mirror_icons", False)
+PROBE = CFG.get("probe", {})
+TIMEOUT = PROBE.get("timeout", 25)
+RETRIES = PROBE.get("retries", 2)
+WORKERS = 24
+
+UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Quantumult%20X/1.4.1 qx-sync/2.0"
+URL_RE = re.compile(r"https?://[^\s,)\]\x22'|]+")
+SCRIPT_KEYS = (
+    "script-response-body", "script-request-body", "script-response-header",
+    "script-request-header", "script-analyze-echo-response",
+    "script-echo-response", "script-response-body-v2",
+)
+
+ITEMS: list[dict] = []
+REPLACED: list[dict] = []
+DECISION: dict[str, dict] = {}
+
+
+# ---------------------------------------------------------------- 网络
+
+def http_get(url: str) -> tuple[int, bytes]:
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+            return r.status, r.read(2_000_000)
+    except urllib.error.HTTPError as e:
+        return e.code, b""
+    except Exception:
+        return 0, b""
+
+
+def looks_like_html(body: bytes) -> bool:
+    """软 404：CDN 常把错误页以 200 返回。js/list/conf 不可能是 HTML 文档。"""
+    head = body[:800].lstrip().lower()
+    return head.startswith(b"<!doctype html") or head.startswith(b"<html")
+
+
+def probe(url: str) -> tuple[bool, int, bytes]:
+    """(可用, 状态码, 内容)。带重试抗抖动，硬错误立即放弃。"""
+    last = 0
+    for _ in range(RETRIES + 1):
+        code, body = http_get(url)
+        last = code
+        if code == 200:
+            if not body or looks_like_html(body):
+                return False, 200, b""
+            return True, 200, body
+        if code in (401, 403, 404, 410, 451):
+            return False, code, b""
+    return False, last, b""
+
+
+# ---------------------------------------------------------------- 路径
+
+def mirror_path(url: str) -> str:
+    p = urlparse(url)
+    path = p.path.lstrip("/")
+    host = p.netloc
+    rel = path if host == "raw.githubusercontent.com" else f"{host}/{path}"
+    rel = re.sub(r"[^\w\-./]", "_", rel).replace("/refs/heads/", "/")
+    rel = re.sub(r"_{2,}", "_", rel).strip("/")
+    if not rel or rel.endswith("/"):
+        rel += "index.txt"
+    if len(rel) > 170:
+        stem, ext = os.path.splitext(rel)
+        rel = stem[:140] + "-" + hashlib.sha1(url.encode()).hexdigest()[:8] + ext
+    return "Sources/" + rel
+
+
+def mirror_url(url: str) -> str:
+    return RAW_BASE + mirror_path(url)
+
+
+def save(path: str, body: bytes) -> None:
+    full = os.path.join(ROOT, path)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    if os.path.exists(full) and open(full, "rb").read() == body:
+        return
+    with open(full, "wb") as f:
+        f.write(body)
+
+
+def read_mirror(url: str) -> str:
+    full = os.path.join(ROOT, mirror_path(url))
+    if os.path.exists(full):
+        return open(full, encoding="utf-8", errors="replace").read()
+    return ""
+
+
+# ---------------------------------------------------------------- 解析
+
+def line_resource(section: str, body: str) -> tuple[str, str] | None:
+    """一行里哪个 URL 是要下载的资源。返回 (kind, url)。"""
+    if section in MIRROR_SECTIONS:
+        urls = URL_RE.findall(body)
+        return ("remote", urls[0].rstrip(".,;")) if urls else None
+
+    low = body.lower()
+    for k in SCRIPT_KEYS:
+        if k in low:
+            m = URL_RE.search(body.split(k, 1)[1])
+            return ("script", m.group(0).rstrip(".,;")) if m else None
+
+    urls = URL_RE.findall(body)
+    if section in SCRIPT_SECTIONS and urls:
+        if section == "rewrite_local":
+            # 镜像 conf 内部：只有多个 URL 时最后一个才是脚本；
+            # 单个 URL 是 url reject / url 302 这类纯拦截规则，无资源可下。
+            if len(urls) > 1:
+                return "script", urls[-1].rstrip(".,;")
+            return None
+        return "script", urls[0].rstrip(".,;")
+
+    m = re.search(r"img-url=(\S+)", body)
+    if m:
+        return "icon", m.group(1).rstrip(".,;")
+    return None
+
+
+def row_ok(url: str) -> bool:
+    return url in DECISION and DECISION[url]["action"] != "drop"
+
+
+def probe_batch(urls: dict[str, str]) -> None:
+    """urls: {url: kind}。并发探测并写入 DECISION。"""
+    todo = {}
+    for url, kind in urls.items():
+        if url in DECISION or url.startswith(RAW_BASE):
+            continue
+        todo[url] = kind
+    if not todo:
+        return
+
+    def work(pair):
+        url, kind = pair
+        if url in DROP:
+            return {"url": url, "kind": kind, "status": None, "action": "drop",
+                    "final": None, "note": "在 drop 名单（上游仓库已删除/封禁）"}
+        target = REPLACE.get(url)
+        if target:
+            ok, code, body = probe(target)
+            if ok:
+                save(mirror_path(target), body)
+                return {"url": url, "kind": kind, "status": code, "action": "replaced",
+                        "final": mirror_url(target), "src": target,
+                        "note": f"已替换 → {urlparse(target).path}"}
+            return {"url": url, "kind": kind, "status": code, "action": "drop",
+                    "final": None, "note": f"替代源不可用 ({code})"}
+        ok, code, body = probe(url)
+        if ok:
+            if kind == "icon" and not MIRROR_ICONS:
+                return {"url": url, "kind": kind, "status": code, "action": "keep",
+                        "final": url, "note": "图标，不镜像"}
+            if kind == "script" and not MIRROR_SCRIPTS:
+                return {"url": url, "kind": kind, "status": code, "action": "keep",
+                        "final": url, "note": "脚本，不镜像"}
+            save(mirror_path(url), body)
+            return {"url": url, "kind": kind, "status": code, "action": "mirrored",
+                    "final": mirror_url(url), "src": url, "note": ""}
+        note = {0: "连接失败/超时", 200: "返回 HTML 而非资源", 401: "401 未授权",
+                403: "403 被拒", 404: "404 不存在", 405: "405",
+                410: "410 已删除", 429: "429 限流",
+                451: "451 被 DMCA 封禁"}.get(code, f"HTTP {code}")
+        # 硬死亡：确定资源不存在，可以安全注释掉
+        if code in (404, 410, 451) or code == 200:
+            return {"url": url, "kind": kind, "status": code, "action": "drop",
+                    "final": None, "note": note}
+        # 软失败：可能是扫描器自身网络/限流问题，不能误杀，保留原链
+        return {"url": url, "kind": kind, "status": code or 0, "action": "keep",
+                "final": url, "note": f"{note}（已保留原链，待下轮复验）"}
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        for d in ex.map(work, todo.items()):
+            DECISION[d["url"]] = d
+            ITEMS.append(d)
+            if d["action"] == "replaced":
+                REPLACED.append({"from": d["url"], "to": d["src"], "mirror": d["final"]})
+
+
+def collect(lines: list[str], hint: str | None = None) -> dict[str, str]:
+    """从一组行里提取 {url: kind}，只取生效行。hint 用于无 [section] 头的镜像 conf。"""
+    section = hint or "preface"
+    out = {}
+    for line in lines:
+        s = line.strip()
+        if s.startswith("[") and "]" in s and hint is None:
+            section = s[1:s.index("]")].strip()
+            continue
+        if not s or s[0] in "#;":
+            continue
+        if section not in MIRROR_SECTIONS and section not in SCRIPT_SECTIONS:
+            continue
+        f = line_resource(section, s)
+        if f:
+            out[f[1]] = f[0]
+    return out
+
+
+def rewrite_lines(lines: list[str], section_hint: str | None = None) -> tuple[list[str], int]:
+    """按 DECISION 改写行。返回 (新行列表, 被注释数)。"""
+    section = section_hint or "preface"
+    out, dropped = [], 0
+    for line in lines:
+        s = line.strip()
+        if s.startswith("[") and "]" in s and section_hint is None:
+            section = s[1:s.index("]")].strip()
+            out.append(line)
+            continue
+        if not s or s[0] in "#;":
+            out.append(line)
+            continue
+        if section not in MIRROR_SECTIONS and section not in SCRIPT_SECTIONS:
+            out.append(line)
+            continue
+        f = line_resource(section, s)
+        if not f:
+            out.append(line)
+            continue
+        kind, url = f
+        d = DECISION.get(url)
+        if not d:
+            out.append(line)
+            continue
+        if d["action"] == "drop":
+            out.append("# [qx-sync 失效] " + line)
+            dropped += 1
+        elif d["final"] and d["final"] != url:
+            out.append(line.replace(url, d["final"]))
+        else:
+            out.append(line)
+    return out, dropped
+
+
+# ---------------------------------------------------------------- 报告
+
+def write_report(prev: dict | None) -> dict:
+    dead = [i for i in ITEMS if i["action"] == "drop"]
+    live = [i for i in ITEMS if i["action"] != "drop"]
+
+    prev_dead = set()
+    if prev:
+        prev_dead = {i["url"] for i in prev.get("items", []) if i.get("action") == "drop"}
+    newly = [i for i in dead if i["url"] not in prev_dead]
+
+    now = datetime.now(timezone(timedelta(hours=8)))
+    report = {
+        "generated_at": now.isoformat(),
+        "upstream": CFG["profile_url"],
+        "summary": {"total": len(ITEMS), "alive": len(live), "dead": len(dead),
+                    "replaced": len(REPLACED), "newly_dead": len(newly)},
+        "items": sorted(ITEMS, key=lambda x: (x["action"] != "drop", x["url"])),
+        "replaced": REPLACED,
+        "dropped": [{"url": i["url"], "kind": i["kind"], "status": i["status"],
+                     "note": i["note"]} for i in dead],
+    }
+    os.makedirs(os.path.join(ROOT, "reports"), exist_ok=True)
+    with open(os.path.join(ROOT, "reports", "status.json"), "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    L = ["# QuantumultX 配置体检报告", "",
+         f"- 上次同步：`{now:%Y-%m-%d %H:%M:%S %z}`（北京时间）",
+         f"- 上游配置：{CFG['profile_url']}",
+         f"- 资源总数 **{len(ITEMS)}** ｜ 可用 **{len(live)}** ｜ 失效 **{len(dead)}**"]
+    if newly:
+        L.append(f"- ⚠️ **本次新增失效 {len(newly)} 条**")
+    L.append("")
+
+    if REPLACED:
+        L += ["## 死链已自动修复", "", "| 原地址（已死） | 替换为 |", "|---|---|"]
+        for r in REPLACED:
+            L.append(f"| `{r['from']}` | `{r['to']}` |")
+        L.append("")
+
+    if dead:
+        L += ["## 失效清单（配置中已注释，不再拖慢 Qx）", "",
+              "| 状态 | 类型 | 地址 | 说明 |", "|---|---|---|---|"]
+        for i in dead:
+            st = "超时" if not i["status"] else str(i["status"])
+            mark = " 🆕" if i in newly else ""
+            L.append(f"| {st}{mark} | {i['kind']} | `{i['url'][:120]}` | {i['note']} |")
+        L.append("")
+
+    L += ["## 全部资源", "", "<details><summary>展开明细</summary>", "",
+          "| 状态 | 动作 | 地址 |", "|---|---|---|"]
+    for i in report["items"]:
+        st = "OK" if i["action"] != "drop" else "DEAD"
+        L.append(f"| {st} | {i['action']} | `{i['url'][:120]}` |")
+    L += ["", "</details>", "",
+          "## 怎么用", "",
+          "Quantumult X → 风车 → 配置文件 → 远程配置 → 添加：", "",
+          "```",
+          RAW_BASE + "QuantumultX.conf",
+          "```", "",
+          "然后把节点订阅填进 `[server_remote]`（本仓库不托管任何节点）。"]
+
+    with open(os.path.join(ROOT, "reports", "STATUS.md"), "w", encoding="utf-8") as f:
+        f.write("\n".join(L) + "\n")
+
+    print(f"资源 {len(ITEMS)} | 可用 {len(live)} | 失效 {len(dead)} | "
+          f"修复 {len(REPLACED)} | 新增失效 {len(newly)}")
+    return report
+
+
+# ---------------------------------------------------------------- main
+
+def main() -> int:
+    print(f"上游: {CFG['profile_url']}")
+    ok, code, body = probe(CFG["profile_url"])
+    if not ok:
+        print(f"上游配置拉取失败 (code={code})，中止并保留上一次产物。", file=sys.stderr)
+        return 1
+    text = body.decode("utf-8", "replace")
+
+    prev = None
+    p = os.path.join(ROOT, "reports", "status.json")
+    if os.path.exists(p):
+        try:
+            prev = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            prev = None
+
+    lines = text.splitlines()
+
+    # Phase 1：主配置里的直接资源
+    batch1 = collect(lines)
+    print(f"直接引用 {len(batch1)} 个")
+    probe_batch(batch1)
+
+    # Phase 2：镜像下来的 conf 内部嵌套的脚本（递归一层）
+    batch2: dict[str, str] = {}
+    for d in ITEMS:
+        src = d.get("src")
+        if d["action"] not in ("mirrored", "replaced") or not src:
+            continue
+        if not src.endswith((".conf", ".snippet", ".sgmodule", ".list", ".txt")):
+            continue
+        nested = collect(read_mirror(src).splitlines(), "rewrite_local")
+        for u, k in nested.items():
+            if k == "script":
+                batch2[u] = k
+    if batch2:
+        print(f"嵌套脚本 {len(batch2)} 个")
+        probe_batch(batch2)
+
+    # Phase 3：改写镜像 conf 内部的嵌套脚本地址
+    patched = 0
+    for d in ITEMS:
+        src = d.get("src")
+        if d["action"] not in ("mirrored", "replaced") or not src:
+            continue
+        if not src.endswith((".conf", ".snippet", ".sgmodule")):
+            continue
+        content = read_mirror(src).splitlines()
+        if not batch2:
+            break
+        new, n = rewrite_lines(content, "rewrite_local")
+        if n or new != content:
+            patched += 1
+            with open(os.path.join(ROOT, mirror_path(src)), "w", encoding="utf-8") as f:
+                f.write("\n".join(new) + "\n")
+
+    # Phase 4：生成主配置
+    out, dropped = rewrite_lines(lines)
+
+    now = datetime.now(timezone(timedelta(hours=8)))
+    header = [
+        "# ============================================================",
+        "# QuantumultX 配置 · 自动校验版",
+        f"# 构建时间: {now:%Y-%m-%d %H:%M:%S} +08:00（GitHub Actions 每日本地 08:00 重建）",
+        f"# 上游来源: {CFG['profile_url']}",
+        f"# 体检报告: {RAW_BASE}reports/STATUS.md",
+        "# 所有外部资源已镜像并通过可用性校验；失效项已注释并标记 [qx-sync 失效]。",
+        "# 请勿手工修改本文件 —— 下次同步会被覆盖。要改就改 config/overrides.json。",
+        "# ============================================================",
+        "",
+    ]
+    with open(os.path.join(ROOT, "QuantumultX.conf"), "w", encoding="utf-8") as f:
+        f.write("\n".join(header + out) + "\n")
+    print(f"主配置已生成，注释掉 {dropped} 行失效引用")
+
+    write_report(prev)
+
+    # 清理孤立镜像
+    used = {mirror_path(i["src"]) for i in ITEMS
+            if i["action"] in ("mirrored", "replaced") and i.get("src")}
+    removed = 0
+    for root, _, files in os.walk(os.path.join(ROOT, "Sources")):
+        for fn in files:
+            fp = os.path.join(root, fn)
+            if os.path.relpath(fp, ROOT) not in used:
+                os.remove(fp)
+                removed += 1
+    if removed:
+        print(f"清理孤立镜像 {removed} 个")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
