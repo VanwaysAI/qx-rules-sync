@@ -58,6 +58,7 @@ REPLACED: list[dict] = []
 STRIPPED: list[str] = []
 ECHO_FIXES: list[dict] = []
 DEAD_ICONS: list[str] = []
+UNKNOWN_POLICY: list[str] = []
 DECISION: dict[str, dict] = {}
 
 
@@ -223,6 +224,89 @@ def fix_echo_response(lines: list[str]) -> tuple[list[str], list[dict]]:
                       "note": "Qx 不接受 URL / data URI 作响应体，远程配置无法提供本地文件，"
                               "整条注释（损失：该 App 的 mock 去广告）"})
     return out, notes
+
+
+POLICY_BUILTIN = {"direct", "reject", "reject-200", "reject-img",
+                  "reject-dict", "reject-array"}
+
+
+def known_policies(conf_lines: list[str]) -> set[str]:
+    """主配置里实际定义了的策略组 + Qx 内置策略。"""
+    groups: set[str] = set()
+    for ln in conf_lines:
+        m = re.match(r"^(?:static|url-latency-benchmark|available|round-robin|dest-hash)"
+                     r"\s*=\s*([^,\n]+)", ln.strip())
+        if m:
+            groups.add(m.group(1).strip())
+    return groups | POLICY_BUILTIN
+
+
+def sanitize_filter_list(path: str, known: set[str]) -> tuple[int, list[str]]:
+    """把引用「不存在的策略」的规则注释掉。
+
+    为什么必须做：Qx 解析远程规则清单时遇到未知策略名，最坏情况会让整个清单
+    加载失败。而这类清单（Mainland.list 的 6.9 万条国内直连）一旦没加载，
+    所有流量都会掉到 FINAL 兜底组走代理——表现就是「国内网站也走节点」，
+    而且 Qx 不一定会明确报错，极难排查。
+    """
+    full = os.path.join(ROOT, path)
+    if not os.path.exists(full):
+        return 0, []
+    raw = open(full, encoding="utf-8", errors="replace").read()
+    out, bad = [], []
+    for ln in raw.splitlines():
+        s = ln.strip()
+        if not s or s[0] in "#;":
+            out.append(ln)
+            continue
+        parts = [p.strip() for p in s.split(",")]
+        if len(parts) < 3:
+            out.append(ln)
+            continue
+        policy = parts[-1]
+        if policy.lower() == "no-resolve":
+            if len(parts) >= 4:
+                policy = parts[-2]      # IP-CIDR,段,策略,no-resolve
+            else:
+                out.append(ln)          # IP-CIDR,段,no-resolve —— 无策略列，靠 force-policy
+                continue
+        if policy in known or policy.lower() in known:
+            out.append(ln)
+        else:
+            out.append("# [qx-sync 未知策略] " + s)
+            bad.append(policy)
+    if bad:
+        with open(full, "w", encoding="utf-8") as f:
+            f.write("\n".join(out) + "\n")
+    return len(bad), bad
+
+
+DEAD_MEMBERS = {"proxy", "Proxy", "PROXY"}
+
+
+def fix_policy_members(lines: list[str]) -> tuple[list[str], int]:
+    """删掉 [policy] 组成员里的悬空通用词（如 `proxy`）。
+
+    上游从 Surge/Loon 迁过来的写法，`proxy` 在这个配置里没有对应策略组。
+    Qx 对无效成员最坏会让**整个组的定义失败**——那样走这个组的流量就会
+    掉回默认节点，表现同样是「分流不生效」。
+    """
+    out, n = [], 0
+    for ln in lines:
+        s = ln.strip()
+        m = re.match(r"^((?:static|available|round-robin|dest-hash)\s*=\s*)([^,\n]+)(.*)$", s)
+        if not m:
+            out.append(ln)
+            continue
+        head, name, rest = m.groups()
+        kept = []
+        for seg in rest.split(","):
+            if seg.strip() in DEAD_MEMBERS:
+                n += 1
+                continue
+            kept.append(seg)
+        out.append(head + name + ",".join(kept))
+    return out, n
 
 
 def normalize_policy_case(lines: list[str]) -> tuple[list[str], int]:
@@ -534,6 +618,13 @@ def write_report(prev: dict | None) -> dict:
         L.append(f"- ⚠️ **本次新增失效 {len(newly)} 条**")
     L.append("")
 
+    if UNKNOWN_POLICY:
+        L += ["## 已清理的「未知策略」规则", "",
+              "远程清单里有规则指向了配置中并不存在的策略组。Qx 遇到这种行最坏会让"
+              "**整份清单加载失败**——而这份清单如果是大陆直连表，后果就是全部流量"
+              "掉到 FINAL 兜底组走代理。已注释掉这些行：", "",
+              f"- 涉及策略名：`{'`、`'.join(sorted(set(UNKNOWN_POLICY)))}`", ""]
+
     if ECHO_FIXES:
         L += ["## 已停用的 echo-response 规则", "",
               "Qx 的 `echo-response` 正文只要是 URI 就拒绝（`https://` 和 `data:` 都算），"
@@ -665,6 +756,24 @@ def main() -> int:
             with open(os.path.join(ROOT, mirror_path(src)), "w", encoding="utf-8") as f:
                 f.write("\n".join(new) + "\n")
 
+    # Phase 3.5：清理远程规则清单里引用不存在策略的行
+    # 这类行最坏会让整份清单加载失败，导致国内直连规则全部失效
+    known = known_policies(lines)
+    total_bad = 0
+    for d in ITEMS:
+        src = d.get("src")
+        if d["action"] not in ("mirrored", "replaced") or not src:
+            continue
+        if not src.endswith((".list", ".txt")):
+            continue
+        n, bad = sanitize_filter_list(mirror_path(src), known)
+        if n:
+            total_bad += n
+            UNKNOWN_POLICY.extend(bad)
+    if total_bad:
+        uniq = ", ".join(sorted(set(UNKNOWN_POLICY)))
+        print(f"清理引用未知策略的规则 {total_bad} 条（策略名：{uniq}）")
+
     # Phase 4：生成主配置
     out, dropped = rewrite_lines(lines)
     out, added = inject_additions(out)
@@ -677,6 +786,9 @@ def main() -> int:
     out, ncase = normalize_policy_case(out)
     if ncase:
         print(f"统一策略名大小写 {ncase} 处")
+    out, nmem = fix_policy_members(out)
+    if nmem:
+        print(f"移除策略组里的悬空成员 {nmem} 个")
     out, moved = fix_final_order(out)
     if moved:
         print("FINAL 已移到 [filter_local] 末尾（原位置导致其后规则永不命中）")

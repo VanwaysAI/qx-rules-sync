@@ -96,7 +96,7 @@ host-keyword, ess.apple.com, direct
 # > 苹果app store
 host, itunes.apple.com, direct
 # > 苹果播客
-host-keyword, amp-api.podcasts.apple.com, proxy
+# [qx-sync 未知策略] host-keyword, amp-api.podcasts.apple.com, proxy
 
 
 # >>>>>>>>>>>>>>> ✅ Q ✅ <<<<<<<<<<<<<<
