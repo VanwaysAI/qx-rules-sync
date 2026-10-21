@@ -57,6 +57,7 @@ ITEMS: list[dict] = []
 REPLACED: list[dict] = []
 STRIPPED: list[str] = []
 ECHO_FIXES: list[dict] = []
+DEAD_ICONS: list[str] = []
 DECISION: dict[str, dict] = {}
 
 
@@ -216,6 +217,87 @@ def fix_echo_response(lines: list[str]) -> tuple[list[str], list[dict]]:
         notes.append({"url": url, "status": 200, "action": "inlined",
                       "note": f"正文内联为 base64（{len(body)} 字节）"})
     return out, notes
+
+
+def normalize_policy_case(lines: list[str]) -> tuple[list[str], int]:
+    """把行尾的 DIRECT / REJECT / PROXY 统一成小写。
+
+    上游到处混用大小写（ADBlack.list 里就有 53 条大写 REJECT）。虽然 Qx 多数
+    情况下能容忍，但统一之后审计脚本才能准确判断策略引用是否悬空。
+    """
+    out, n = [], 0
+    for ln in lines:
+        head, sep, tail = ln.rpartition(",")
+        if sep and tail.strip() in ("DIRECT", "REJECT", "PROXY"):
+            ln = head + ", " + tail.strip().lower()
+            n += 1
+        out.append(ln)
+    return out, n
+
+
+def fix_final_order(lines: list[str]) -> tuple[list[str], bool]:
+    """[filter_local] 里 FINAL 必须是最后一条。
+
+    上游把它写在了 GEOIP,CN 前面 → 那条 GEOIP 永远不可能命中（顺序匹配、
+    命中即止）。等于国内 IP 也走代理。这是上游的笔误，作者意图显然是
+    「国内直连」，只是写错了位置。
+    """
+    out: list[str] = []
+    for header, body in split_sections(lines):
+        if header is None:
+            out.extend(body)
+            continue
+        out.append(header)
+        if header.strip().strip("[]").strip().lower() != "filter_local":
+            out.extend(body)
+            continue
+        finals = [ln for ln in body if ln.strip().upper().startswith("FINAL,")]
+        if not finals:
+            out.extend(body)
+            continue
+        rest = [ln for ln in body if not ln.strip().upper().startswith("FINAL,")]
+        tail: list[str] = []
+        while rest and not rest[-1].strip():
+            tail.append(rest.pop())
+        out.extend(rest)
+        out.extend(finals)
+        out.extend(tail)
+    return out, out != lines
+
+
+def prune_dead_icons(lines: list[str]) -> tuple[list[str], set[str]]:
+    """img-url 指向死链时只去掉这个属性，不注释整行。
+
+    图标挂了不影响功能，但留着会让 Qx 反复去拉一个 404。注意别整行注释掉——
+    那样会把任务/规则本身一起废掉。
+    """
+    icons: set[str] = set()
+    for ln in lines:
+        for m in re.finditer(r"img-url=(\S+?)(?=,|$)", ln):
+            u = m.group(1).strip()
+            if u.startswith("http") and not u.startswith(RAW_BASE):
+                icons.add(u)
+    if not icons:
+        return lines, set()
+
+    def chk(u: str) -> tuple[str, bool]:
+        ok, _, _ = probe(u)
+        return u, ok
+
+    dead: set[str] = set()
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        for u, ok in ex.map(chk, sorted(icons)):
+            if not ok:
+                dead.add(u)
+    if not dead:
+        return lines, set()
+
+    out = []
+    for ln in lines:
+        for u in dead:
+            ln = re.sub(r",\s*img-url=" + re.escape(u), "", ln)
+        out.append(ln)
+    return out, dead
 
 
 def strip_empty_keys(lines: list[str]) -> tuple[list[str], list[str]]:
@@ -585,6 +667,16 @@ def main() -> int:
     if stripped:
         print(f"移除空值键 {len(stripped)} 个：{', '.join(stripped)}")
         STRIPPED[:] = stripped
+    out, ncase = normalize_policy_case(out)
+    if ncase:
+        print(f"统一策略名大小写 {ncase} 处")
+    out, moved = fix_final_order(out)
+    if moved:
+        print("FINAL 已移到 [filter_local] 末尾（原位置导致其后规则永不命中）")
+    out, dead_icons = prune_dead_icons(out)
+    if dead_icons:
+        print(f"清理失效图标 {len(dead_icons)} 个（保留任务本身）")
+        DEAD_ICONS[:] = sorted(dead_icons)
 
     now = datetime.now(timezone(timedelta(hours=8)))
     header = [
