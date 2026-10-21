@@ -1,9 +1,8 @@
 # QuantumultX 配置体检报告
 
-- 上次同步：`2026-10-21 09:53:10 +0800`（北京时间）
+- 上次同步：`2026-10-21 09:53:51 +0800`（北京时间）
 - 上游配置：https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf
 - 资源总数 **88** ｜ 可用 **81** ｜ 失效 **7**
-- ⚠️ **本次新增失效 7 条**
 
 ## 死链已自动修复
 
@@ -24,13 +23,13 @@
 
 | 状态 | 类型 | 地址 | 说明 |
 |---|---|---|---|
-| 超时 🆕 | remote | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/amap.snippet` | 在 drop 名单（上游仓库已删除/封禁） |
-| 超时 🆕 | remote | `https://raw.githubusercontent.com/WeiRen0/Scripts/main/ZHVIP.js` | 在 drop 名单（上游仓库已删除/封禁） |
-| 超时 🆕 | remote | `https://raw.githubusercontent.com/WeiRen0/Scripts/main/wxds.js` | 在 drop 名单（上游仓库已删除/封禁） |
-| 超时 🆕 | script | `https://raw.githubusercontent.com/chouchoui/QuanX/master/Scripts/testflight/Auto_join_TF.js` | 在 drop 名单（上游仓库已删除/封禁） |
-| 超时 🆕 | script | `https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Script/JD/ClCart.js` | 在 drop 名单（上游仓库已删除/封禁） |
-| 404 🆕 | script | `https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_remove_ads.js` | 404 不存在 |
-| 超时 🆕 | script | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/zhihu.js` | 在 drop 名单（上游仓库已删除/封禁） |
+| 超时 | remote | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/amap.snippet` | 在 drop 名单（上游仓库已删除/封禁） |
+| 超时 | remote | `https://raw.githubusercontent.com/WeiRen0/Scripts/main/ZHVIP.js` | 在 drop 名单（上游仓库已删除/封禁） |
+| 超时 | remote | `https://raw.githubusercontent.com/WeiRen0/Scripts/main/wxds.js` | 在 drop 名单（上游仓库已删除/封禁） |
+| 超时 | script | `https://raw.githubusercontent.com/chouchoui/QuanX/master/Scripts/testflight/Auto_join_TF.js` | 在 drop 名单（上游仓库已删除/封禁） |
+| 超时 | script | `https://raw.githubusercontent.com/WSL33099/QuantumultX/main/Script/JD/ClCart.js` | 在 drop 名单（上游仓库已删除/封禁） |
+| 404 | script | `https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_remove_ads.js` | 404 不存在 |
+| 超时 | script | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/zhihu.js` | 在 drop 名单（上游仓库已删除/封禁） |
 
 ## 全部资源
 
