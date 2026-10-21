@@ -346,12 +346,20 @@ def fix_final_order(lines: list[str]) -> tuple[list[str], bool]:
             out.extend(body)
             continue
         rest = [ln for ln in body if not ln.strip().upper().startswith("FINAL,")]
-        tail: list[str] = []
-        while rest and not rest[-1].strip():
-            tail.append(rest.pop())
-        out.extend(rest)
+        # 插到最后一条「真正的规则」之后，而不是整段末尾——
+        # 否则会落到 [task_local] 上方的注释块里，看着像属于别的 section。
+        last_rule = -1
+        for i, ln in enumerate(rest):
+            s = ln.strip()
+            if s and s[0] not in "#;":
+                last_rule = i
+        if last_rule < 0:
+            out.extend(rest)
+            out.extend(finals)
+            continue
+        out.extend(rest[:last_rule + 1])
         out.extend(finals)
-        out.extend(tail)
+        out.extend(rest[last_rule + 1:])
     return out, out != lines
 
 
