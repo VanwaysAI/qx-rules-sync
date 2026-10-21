@@ -98,6 +98,16 @@ Qx 见到 `p12` 键存在但没值，会以为"用户要用自定义证书"，�
 
 **如果你在 Qx 里手填过自定义证书**，注意本仓库的配置是每天覆盖重建的，别把证书写进配置文件——用 App 内的证书设置。
 
+第二个坑在 `echo-response`：
+
+```ini
+^https?:\/\/wrapper\.cyapi\.cn\/v1\/activity\? url echo-response application/json echo-response https://....../caiyun.json
+```
+
+Qx 的 `echo-response` 只接受**字面量**响应体（或 `data:` URI），不能填 URL。上游把 mock JSON 的地址直接写在响应体位置，Qx 会报「echo-response 需要本机 Data 目录中的正文文件，不能直接引用 URL/URI」，然后**整条规则被忽略**。
+
+`fix_echo_response()` 会把那个 JSON 下载下来、base64 编码成 `data:application/json;base64,...` 内联回去，功能保留，警告消失。
+
 ## 注意事项
 
 - **定时任务会被 GitHub 自动暂停**：仓库连续 60 天无提交活动，schedule 会被禁用。每周手动触发一次，或者给仓库随便提个 commit 就行。

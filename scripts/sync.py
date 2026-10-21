@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -55,6 +56,7 @@ SCRIPT_KEYS = (
 ITEMS: list[dict] = []
 REPLACED: list[dict] = []
 STRIPPED: list[str] = []
+ECHO_FIXES: list[dict] = []
 DECISION: dict[str, dict] = {}
 
 
@@ -173,6 +175,47 @@ def addition_urls() -> dict[str, str]:
             if it.get("url"):
                 out[it["url"]] = "remote"
     return out
+
+
+ECHO_RE = re.compile(
+    r"^(.*?\burl\s+echo-response\s+)([\w/+.-]+)(\s+echo-response\s+)(https?://\S+)\s*$"
+)
+
+
+def fix_echo_response(lines: list[str]) -> tuple[list[str], list[dict]]:
+    """修掉 `echo-response ... echo-response <URL>` 这种写法。
+
+    Qx 的 echo-response 只接受**字面量**响应体（或 data: URI），不能给 URL。
+    上游直接把 mock JSON 的地址填在响应体位置，Qx 会报
+    「echo-response 需要本机 Data 目录中的正文文件，不能直接引用 URL/URI」
+    然后整条规则被忽略。这里把 JSON 下载下来转成 base64 data URI 内联回去，
+    功能得以保留。
+    """
+    out, notes = [], []
+    for line in lines:
+        s = line.strip()
+        if not s or s[0] in "#;" or "echo-response" not in s:
+            out.append(line)
+            continue
+        if "script-echo-response" in s or "script-analyze-echo-response" in s:
+            out.append(line)
+            continue
+        m = ECHO_RE.match(s)
+        if not m:
+            out.append(line)
+            continue
+        ctype, url = m.group(2), m.group(4)
+        ok, code, body = probe(url)
+        if not ok:
+            out.append("# [qx-sync echo-response 无法内联] " + s)
+            notes.append({"url": url, "status": code, "action": "drop",
+                          "note": "mock 正文拉不到，规则已注释"})
+            continue
+        b64 = base64.b64encode(body).decode("ascii")
+        out.append(m.group(1) + ctype + m.group(3) + f"data:{ctype};base64," + b64)
+        notes.append({"url": url, "status": 200, "action": "inlined",
+                      "note": f"正文内联为 base64（{len(body)} 字节）"})
+    return out, notes
 
 
 def strip_empty_keys(lines: list[str]) -> tuple[list[str], list[str]]:
@@ -403,6 +446,15 @@ def write_report(prev: dict | None) -> dict:
         L.append(f"- ⚠️ **本次新增失效 {len(newly)} 条**")
     L.append("")
 
+    if ECHO_FIXES:
+        L += ["## echo-response 响应体已内联", "",
+              "Qx 的 `echo-response` 只认字面量响应体，不能填 URL。上游把 mock 地址"
+              "直接写在响应体位置，会被 Qx 忽略。已把正文下载下来转成 base64 内联：", ""]
+        for e in ECHO_FIXES:
+            mark = "✅ 已内联" if e["action"] == "inlined" else "❌ 已注释"
+            L.append(f"- {mark} · `{e['url']}` · {e['note']}")
+        L.append("")
+
     if STRIPPED:
         L += ["## 已移除的空值配置项", "",
               "上游留了值为空的占位符，Qx 会把它当成「我要用自定义证书」从而报 "
@@ -516,7 +568,10 @@ def main() -> int:
         if not batch2:
             break
         new, n = rewrite_lines(content, "rewrite_local")
-        if n or new != content:
+        new, echo_notes = fix_echo_response(new)
+        if echo_notes:
+            ECHO_FIXES.extend(echo_notes)
+        if n or echo_notes or new != content:
             patched += 1
             with open(os.path.join(ROOT, mirror_path(src)), "w", encoding="utf-8") as f:
                 f.write("\n".join(new) + "\n")
@@ -524,6 +579,8 @@ def main() -> int:
     # Phase 4：生成主配置
     out, dropped = rewrite_lines(lines)
     out, added = inject_additions(out)
+    out, echo_main = fix_echo_response(out)
+    ECHO_FIXES.extend(echo_main)
     out, stripped = strip_empty_keys(out)
     if stripped:
         print(f"移除空值键 {len(stripped)} 个：{', '.join(stripped)}")
