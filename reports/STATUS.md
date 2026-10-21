@@ -1,14 +1,15 @@
 # QuantumultX 配置体检报告
 
-- 上次同步：`2026-10-21 14:51:29 +0800`（北京时间）
+- 上次同步：`2026-10-21 17:45:23 +0800`（北京时间）
 - 上游配置：https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf
 - 资源总数 **90** ｜ 可用 **83** ｜ 失效 **7**
 
-## echo-response 响应体已内联
+## 已停用的 echo-response 规则
 
-Qx 的 `echo-response` 只认字面量响应体，不能填 URL。上游把 mock 地址直接写在响应体位置，会被 Qx 忽略。已把正文下载下来转成 base64 内联：
+Qx 的 `echo-response` 正文只要是 URI 就拒绝（`https://` 和 `data:` 都算），只认 Qx 沙盒里的本地文件 —— 远程配置没法往用户手机里分发文件，所以这类规则无解，已整条注释：
 
-- ✅ 已内联 · `https://raw.githubusercontent.com/Keywos/rule/main/mocks/caiyun.json` · 正文内联为 base64（314 字节）
+- ❌ 已停用 · `https://raw.githubusercontent.com/Keywos/rule/main/mocks/caiyun.json`
+  - Qx 不接受 URL / data URI 作响应体，远程配置无法提供本地文件，整条注释（损失：该 App 的 mock 去广告）
 
 ## 已移除的空值配置项
 

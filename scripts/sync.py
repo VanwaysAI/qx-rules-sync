@@ -195,13 +195,15 @@ ECHO_RE = re.compile(
 
 
 def fix_echo_response(lines: list[str]) -> tuple[list[str], list[dict]]:
-    """修掉 `echo-response ... echo-response <URL>` 这种写法。
+    """把 `echo-response ... echo-response <URL>` 这类规则整条注释掉。
 
-    Qx 的 echo-response 只接受**字面量**响应体（或 data: URI），不能给 URL。
-    上游直接把 mock JSON 的地址填在响应体位置，Qx 会报
-    「echo-response 需要本机 Data 目录中的正文文件，不能直接引用 URL/URI」
-    然后整条规则被忽略。这里把 JSON 下载下来转成 base64 data URI 内联回去，
-    功能得以保留。
+    为什么不是"修好"而是"丢掉"：
+      Qx 的 echo-response 只要正文是 URI 形式就拒绝，实测两种写法都被拒：
+        - `... echo-response https://x/y.json`   → 报「不能直接引用 URL/URI」
+        - `... echo-response data:application/json;base64,xxx` → 同样是 URI，一样被拒
+      Qx 提示「需要本机 Data 目录中的正文文件」——也就是说只有引用 App 沙盒里的
+      本地文件才行，而远程配置没办法把一个文件分发进用户手机的 App 沙盒。
+      所以这类规则在远程配置里无解，注释掉是唯一不会报错的选项。
     """
     out, notes = [], []
     for line in lines:
@@ -216,17 +218,10 @@ def fix_echo_response(lines: list[str]) -> tuple[list[str], list[dict]]:
         if not m:
             out.append(line)
             continue
-        ctype, url = m.group(2), m.group(4)
-        ok, code, body = probe(url)
-        if not ok:
-            out.append("# [qx-sync echo-response 无法内联] " + s)
-            notes.append({"url": url, "status": code, "action": "drop",
-                          "note": "mock 正文拉不到，规则已注释"})
-            continue
-        b64 = base64.b64encode(body).decode("ascii")
-        out.append(m.group(1) + ctype + m.group(3) + f"data:{ctype};base64," + b64)
-        notes.append({"url": url, "status": 200, "action": "inlined",
-                      "note": f"正文内联为 base64（{len(body)} 字节）"})
+        out.append("# [qx-sync 已停用] " + s)
+        notes.append({"url": m.group(4), "status": 200, "action": "dropped",
+                      "note": "Qx 不接受 URL / data URI 作响应体，远程配置无法提供本地文件，"
+                              "整条注释（损失：该 App 的 mock 去广告）"})
     return out, notes
 
 
@@ -540,12 +535,13 @@ def write_report(prev: dict | None) -> dict:
     L.append("")
 
     if ECHO_FIXES:
-        L += ["## echo-response 响应体已内联", "",
-              "Qx 的 `echo-response` 只认字面量响应体，不能填 URL。上游把 mock 地址"
-              "直接写在响应体位置，会被 Qx 忽略。已把正文下载下来转成 base64 内联：", ""]
+        L += ["## 已停用的 echo-response 规则", "",
+              "Qx 的 `echo-response` 正文只要是 URI 就拒绝（`https://` 和 `data:` 都算），"
+              "只认 Qx 沙盒里的本地文件 —— 远程配置没法往用户手机里分发文件，"
+              "所以这类规则无解，已整条注释：", ""]
         for e in ECHO_FIXES:
-            mark = "✅ 已内联" if e["action"] == "inlined" else "❌ 已注释"
-            L.append(f"- {mark} · `{e['url']}` · {e['note']}")
+            L.append(f"- ❌ 已停用 · `{e['url']}`")
+            L.append(f"  - {e['note']}")
         L.append("")
 
     if STRIPPED:
