@@ -1,8 +1,15 @@
 # QuantumultX 配置体检报告
 
-- 上次同步：`2026-10-21 10:21:38 +0800`（北京时间）
+- 上次同步：`2026-10-21 10:30:45 +0800`（北京时间）
 - 上游配置：https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf
 - 资源总数 **90** ｜ 可用 **83** ｜ 失效 **7**
+
+## 已移除的空值配置项
+
+上游留了值为空的占位符，Qx 会把它当成「我要用自定义证书」从而报 `MitM 错误的 p12 或 p12 passphrase`。以下行已从生成配置中删除：
+
+- `passphrase =`
+- `p12 =`
 
 ## 死链已自动修复
 

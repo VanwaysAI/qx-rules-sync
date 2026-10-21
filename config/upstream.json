@@ -6,6 +6,7 @@
   "script_sections": ["task_local", "rewrite_local", "http_backend"],
   "mirror_scripts": true,
   "mirror_icons": false,
+  "strip_empty_keys": ["p12", "passphrase"],
   "probe": {
     "timeout": 25,
     "retries": 2

@@ -38,6 +38,7 @@ MIRROR_SECTIONS = set(CFG["mirror_sections"])
 SCRIPT_SECTIONS = set(CFG["script_sections"])
 MIRROR_SCRIPTS = CFG.get("mirror_scripts", True)
 MIRROR_ICONS = CFG.get("mirror_icons", False)
+STRIP_EMPTY_KEYS = {k.lower() for k in CFG.get("strip_empty_keys", [])}
 PROBE = CFG.get("probe", {})
 TIMEOUT = PROBE.get("timeout", 25)
 RETRIES = PROBE.get("retries", 2)
@@ -53,6 +54,7 @@ SCRIPT_KEYS = (
 
 ITEMS: list[dict] = []
 REPLACED: list[dict] = []
+STRIPPED: list[str] = []
 DECISION: dict[str, dict] = {}
 
 
@@ -171,6 +173,25 @@ def addition_urls() -> dict[str, str]:
             if it.get("url"):
                 out[it["url"]] = "remote"
     return out
+
+
+def strip_empty_keys(lines: list[str]) -> tuple[list[str], list[str]]:
+    """删掉「键 = 空值」的行。
+
+    为什么：上游配置留了 `p12 = ` 和 `passphrase = ` 两个占位符。Qx 看到
+    p12 键存在但值为空，会去加载一个空证书，直接弹
+    「MitM 错误的 p12 或 p12 passphrase，连接已断开」，MITM 整个起不来，
+    所有 rewrite 全废。删掉这两行 Qx 就会用自己生成的 CA。
+    """
+    out, removed = [], []
+    for line in lines:
+        s = line.strip()
+        m = re.match(r"^([A-Za-z0-9_-]+)\s*=\s*$", s)
+        if m and m.group(1).lower() in STRIP_EMPTY_KEYS:
+            removed.append(s.rstrip())
+            continue
+        out.append(line)
+    return out, removed
 
 
 def split_sections(lines: list[str]) -> list[tuple[str | None, list[str]]]:
@@ -382,6 +403,14 @@ def write_report(prev: dict | None) -> dict:
         L.append(f"- ⚠️ **本次新增失效 {len(newly)} 条**")
     L.append("")
 
+    if STRIPPED:
+        L += ["## 已移除的空值配置项", "",
+              "上游留了值为空的占位符，Qx 会把它当成「我要用自定义证书」从而报 "
+              "`MitM 错误的 p12 或 p12 passphrase`。以下行已从生成配置中删除：", ""]
+        for s in STRIPPED:
+            L.append(f"- `{s}`")
+        L.append("")
+
     if REPLACED:
         L += ["## 死链已自动修复", "", "| 原地址（已死） | 替换为 |", "|---|---|"]
         for r in REPLACED:
@@ -495,6 +524,10 @@ def main() -> int:
     # Phase 4：生成主配置
     out, dropped = rewrite_lines(lines)
     out, added = inject_additions(out)
+    out, stripped = strip_empty_keys(out)
+    if stripped:
+        print(f"移除空值键 {len(stripped)} 个：{', '.join(stripped)}")
+        STRIPPED[:] = stripped
 
     now = datetime.now(timezone(timedelta(hours=8)))
     header = [
