@@ -108,6 +108,19 @@ Qx 的 `echo-response` 只接受**字面量**响应体（或 `data:` URI），�
 
 `fix_echo_response()` 会把那个 JSON 下载下来、base64 编码成 `data:application/json;base64,...` 内联回去，功能保留，警告消失。
 
+## 自检脚本
+
+改完配置想确认没搞坏，跑这三条：
+
+```bash
+python3 scripts/audit.py QuantumultX.conf           # 结构/语法/策略引用
+python3 scripts/audit_sources.py QuantumultX.conf   # 镜像清单里的策略名是否真实存在
+python3 scripts/verify_integrity.py                 # 镜像文件是否被截断（对比上游大小）
+python3 scripts/online_check.py QuantumultX.conf    # 推到 GitHub 后是否真的拿得到
+```
+
+`verify_integrity.py` 是为了防一类特别隐蔽的故障：`Mainland.list` 有 2.99MB，早期版本读取时卡了 2MB 上限，结果**只下到 2MB、丢了 26,228 条国内直连规则**——HTTP 200、文件存在、Qx 也不报错，只是国内网站开始走代理。现在读取用 `r.read()` 不限长度，并校验 `Content-Length` 与实际字节数是否一致，不一致宁可判失败也不落盘残文件。
+
 ## 注意事项
 
 - **定时任务会被 GitHub 自动暂停**：仓库连续 60 天无提交活动，schedule 会被禁用。每周手动触发一次，或者给仓库随便提个 commit 就行。
