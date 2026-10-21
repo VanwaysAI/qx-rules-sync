@@ -63,11 +63,22 @@ DECISION: dict[str, dict] = {}
 
 # ---------------------------------------------------------------- 网络
 
+MAX_BYTES = 64 * 1024 * 1024   # 单个资源硬上限，超过视为异常直接放弃
+
+
 def http_get(url: str) -> tuple[int, bytes]:
+    """完整读取。绝不设小上限——Mainland.list 有 3MB，卡 2MB 会静默截断，
+    丢掉三分之一的大陆直连规则，而且表面上一切正常（HTTP 200、文件存在）。"""
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-            return r.status, r.read(2_000_000)
+            declared = r.headers.get("Content-Length")
+            if declared and int(declared) > MAX_BYTES:
+                return 413, b""
+            body = r.read()
+            if declared and len(body) != int(declared):
+                return 0, b""          # 读到的不完整，宁可判失败也不落盘残文件
+            return r.status, body
     except urllib.error.HTTPError as e:
         return e.code, b""
     except Exception:
