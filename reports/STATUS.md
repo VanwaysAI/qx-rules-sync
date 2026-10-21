@@ -1,8 +1,8 @@
 # QuantumultX 配置体检报告
 
-- 上次同步：`2026-10-21 09:56:30 +0800`（北京时间）
+- 上次同步：`2026-10-21 10:21:21 +0800`（北京时间）
 - 上游配置：https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf
-- 资源总数 **88** ｜ 可用 **81** ｜ 失效 **7**
+- 资源总数 **90** ｜ 可用 **83** ｜ 失效 **7**
 
 ## 死链已自动修复
 
@@ -18,6 +18,13 @@
 | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/break/kuwo.js` | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js` |
 | `https://raw.githubusercontent.com/RuCu6/QuanX/main/Scripts/weibo.js` | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js` |
 | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly_json.js` | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xmly/xmly_json.js` |
+
+## 额外追加的规则源（上游配置原本没有）
+
+- ✅ **filter_remote** · 插在最前 · 最高优先级 · `https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list`
+  - 63 条 direct 修正，把被误分到外区的国内站点拉回直连。必须最高优先级，否则被 ADBlack 的 reject 抢先命中。
+- ✅ **filter_remote** · 追加到末尾 · 最低优先级 · `https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filter.list`
+  - 2787 条 reject 广告拦截，作为 ADBlack 的补充。放最后，不干扰已有分流。
 
 ## 失效清单（配置中已注释，不再拖慢 Qx）
 
@@ -105,6 +112,8 @@
 | OK | mirrored | `https://raw.githubusercontent.com/dompling/Script/master/jd/jd_cookie_search.js` |
 | OK | mirrored | `https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js` |
 | OK | mirrored | `https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js` |
+| OK | mirrored | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filter.list` |
+| OK | mirrored | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list` |
 | OK | mirrored | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/scripts/Flightradar24.js` |
 | OK | mirrored | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/51card.js` |
 | OK | mirrored | `https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/555Ad.js` |

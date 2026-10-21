@@ -30,6 +30,9 @@ OVR = json.load(open(os.path.join(ROOT, "config", "overrides.json"), encoding="u
 REPLACE = OVR.get("replace", {})
 DROP = set(OVR.get("drop", []))
 
+_add_path = os.path.join(ROOT, "config", "additions.json")
+ADDITIONS = json.load(open(_add_path, encoding="utf-8")) if os.path.exists(_add_path) else {}
+
 RAW_BASE = CFG["raw_base"].rstrip("/") + "/"
 MIRROR_SECTIONS = set(CFG["mirror_sections"])
 SCRIPT_SECTIONS = set(CFG["script_sections"])
@@ -156,6 +159,83 @@ def line_resource(section: str, body: str) -> tuple[str, str] | None:
 
 def row_ok(url: str) -> bool:
     return url in DECISION and DECISION[url]["action"] != "drop"
+
+
+def addition_urls() -> dict[str, str]:
+    """追加资源同样要探测、镜像、可被 overrides 修复。"""
+    out = {}
+    for section, items in ADDITIONS.items():
+        if section.startswith("_"):
+            continue
+        for it in items:
+            if it.get("url"):
+                out[it["url"]] = "remote"
+    return out
+
+
+def split_sections(lines: list[str]) -> list[tuple[str | None, list[str]]]:
+    """按 [section] 切块。返回 [(原始头部行或 None, 块内行)]。"""
+    chunks: list[tuple[str | None, list[str]]] = [(None, [])]
+    for line in lines:
+        s = line.strip()
+        if s.startswith("[") and "]" in s:
+            chunks.append((line, []))
+        else:
+            chunks[-1][1].append(line)
+    return chunks
+
+
+def inject_additions(lines: list[str]) -> tuple[list[str], int]:
+    """把 config/additions.json 里的额外资源插入对应 section。
+
+    为什么需要：filter_remote 是顺序匹配、先命中先生效。direct 修正类
+    如果追加在末尾，会被前面 ADBlack 的 reject 抢先吃掉，等于没加。
+    """
+    if not ADDITIONS:
+        return lines, 0
+
+    by_section = {s: items for s, items in ADDITIONS.items() if not s.startswith("_")}
+    out: list[str] = []
+    added = 0
+
+    for header, body in split_sections(lines):
+        if header is None:
+            out.extend(body)
+            continue
+
+        key = header.strip().strip("[]").strip()
+        out.append(header)
+        items = by_section.get(key, [])
+
+        def render(it: dict) -> str:
+            d = DECISION.get(it["url"])
+            if not d:
+                return "# [qx-sync 未探测] " + it["line"].replace("{url}", it["url"])
+            line = it["line"].replace("{url}", d["final"] or it["url"])
+            if d["action"] == "drop":
+                return "# [qx-sync 失效] " + line
+            return line
+
+        pre = [render(i) for i in items if i.get("position") == "prepend"]
+        post = [render(i) for i in items if i.get("position") != "prepend"]
+
+        out.extend(pre)
+        added += len(pre)
+        out.extend(body)
+
+        if post:
+            # 插到本块最后一个有效行之后，避免被尾部空行/注释隔开
+            start = len(out) - len(body)
+            idx = len(out)
+            for k in range(len(out) - 1, start - 1, -1):
+                t = out[k].strip()
+                if t and not t.startswith("#") and not t.startswith(";"):
+                    idx = k + 1
+                    break
+            out[idx:idx] = post
+            added += len(post)
+
+    return out, added
 
 
 def probe_batch(urls: dict[str, str]) -> None:
@@ -308,6 +388,20 @@ def write_report(prev: dict | None) -> dict:
             L.append(f"| `{r['from']}` | `{r['to']}` |")
         L.append("")
 
+    if ADDITIONS:
+        L += ["## 额外追加的规则源（上游配置原本没有）", ""]
+        for sec, items in ADDITIONS.items():
+            if sec.startswith("_"):
+                continue
+            for it in items:
+                d = DECISION.get(it["url"], {})
+                where = "插在最前 · 最高优先级" if it.get("position") == "prepend" else "追加到末尾 · 最低优先级"
+                state = "✅" if d.get("action") not in (None, "drop") else "❌ 未生效"
+                L.append(f"- {state} **{sec}** · {where} · `{it['url']}`")
+                if it.get("why"):
+                    L.append(f"  - {it['why']}")
+        L.append("")
+
     if dead:
         L += ["## 失效清单（配置中已注释，不再拖慢 Qx）", "",
               "| 状态 | 类型 | 地址 | 说明 |", "|---|---|---|---|"]
@@ -358,9 +452,11 @@ def main() -> int:
 
     lines = text.splitlines()
 
-    # Phase 1：主配置里的直接资源
+    # Phase 1：主配置里的直接资源 + 追加资源
     batch1 = collect(lines)
-    print(f"直接引用 {len(batch1)} 个")
+    extra = addition_urls()
+    batch1.update(extra)
+    print(f"直接引用 {len(batch1)} 个（含追加 {len(extra)}）")
     probe_batch(batch1)
 
     # Phase 2：镜像下来的 conf 内部嵌套的脚本（递归一层）
@@ -398,6 +494,7 @@ def main() -> int:
 
     # Phase 4：生成主配置
     out, dropped = rewrite_lines(lines)
+    out, added = inject_additions(out)
 
     now = datetime.now(timezone(timedelta(hours=8)))
     header = [
@@ -413,7 +510,7 @@ def main() -> int:
     ]
     with open(os.path.join(ROOT, "QuantumultX.conf"), "w", encoding="utf-8") as f:
         f.write("\n".join(header + out) + "\n")
-    print(f"主配置已生成，注释掉 {dropped} 行失效引用")
+    print(f"主配置已生成，注释掉 {dropped} 行失效引用，注入 {added} 条追加规则")
 
     write_report(prev)
 

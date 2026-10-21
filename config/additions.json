@@ -1,0 +1,21 @@
+{
+  "_comment": "在上游配置基础上追加的额外远程资源。position: prepend = 插到该 section 最前（优先级最高），append = 追加到末尾。line 模板里的 {url} 会被替换成镜像后的地址。",
+  "_note": "filter_remote 是顺序匹配、先命中先生效。所以 direct 修正类必须 prepend，否则会被前面的 reject 名单吃掉。",
+
+  "filter_remote": [
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list",
+      "line": "{url}, tag=分流修正, update-interval=86400, opt-parser=false, enabled=true",
+      "position": "prepend",
+      "why": "63 条 direct 修正，把被误分到外区的国内站点拉回直连。必须最高优先级，否则被 ADBlack 的 reject 抢先命中。"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filter.list",
+      "line": "{url}, tag=广告增强, update-interval=86400, opt-parser=false, enabled=true",
+      "position": "append",
+      "why": "2787 条 reject 广告拦截，作为 ADBlack 的补充。放最后，不干扰已有分流。"
+    }
+  ],
+
+  "rewrite_remote": []
+}

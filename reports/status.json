@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-21T09:56:30.841789+08:00",
+  "generated_at": "2026-10-21T10:21:21.432368+08:00",
   "upstream": "https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf",
   "summary": {
-    "total": 88,
-    "alive": 81,
+    "total": 90,
+    "alive": 83,
     "dead": 7,
     "replaced": 10,
     "newly_dead": 0
@@ -612,6 +612,24 @@
       "action": "mirrored",
       "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js",
       "src": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hzh/hzh.js",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filter.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/QuantumultX/filter/filter.list",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filter.list",
+      "note": ""
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list",
+      "kind": "remote",
+      "status": 200,
+      "action": "mirrored",
+      "final": "https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/Sources/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list",
+      "src": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/filter/filterFix.list",
       "note": ""
     },
     {

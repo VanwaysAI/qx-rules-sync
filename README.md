@@ -14,6 +14,19 @@ https://raw.githubusercontent.com/VanwaysAI/qx-rules-sync/main/QuantumultX.conf
 
 节点订阅自己填进 `[server_remote]`，本仓库**不托管任何节点**。
 
+## 在上游之外额外追加的规则
+
+上游配置本身缺两块，`config/additions.json` 补上了，位置经过优先级计算：
+
+| 规则源 | 位置 | 内容 |
+|---|---|---|
+| `fmz200/.../filter/filterFix.list` | **`[filter_remote]` 最前** | 63 条 `direct` 修正，把被误分到外区的国内站点拉回直连 |
+| `fmz200/.../filter/filter.list` | **`[filter_remote]` 末尾** | 2787 条 `reject` 广告拦截，作为 `ADBlack.list` 的补充 |
+
+**顺序不能反。** `[filter_remote]` 是顺序匹配、先命中先生效。`filterFix` 的 `direct` 如果排在 `ADBlack.list` 后面，会被前面那条 `reject` 抢先吃掉，等于白加。
+
+要加自己的规则源，往 `config/additions.json` 的数组里塞一条就行，`line` 里的 `{url}` 会被替换成镜像后的地址。
+
 ## 它做了什么
 
 | 步骤 | 说明 |
