@@ -325,6 +325,25 @@ def normalize_policy_case(lines: list[str]) -> tuple[list[str], int]:
     return out, n
 
 
+def normalize_update_interval(lines: list[str], seconds: int = 86400) -> tuple[list[str], int]:
+    """把指向本镜像的远程资源的 update-interval 统一成 1 天。
+
+    坑：上游给分流清单写的是 172800（2 天）。Qx 的「更新配置」只会重新下载
+    **已过 update-interval 的资源**，所以清单一旦被缓存成坏的一版，最长要等
+    两天才会被替换 —— 中间你改什么配置都"看起来没生效"。而本仓库是每天重建
+    的，客户端按天刷新正好对齐。
+    """
+    out, n = [], 0
+    for ln in lines:
+        if "qx-rules-sync" in ln and "update-interval=" in ln:
+            new = re.sub(r"update-interval=\d+", f"update-interval={seconds}", ln)
+            if new != ln:
+                n += 1
+            ln = new
+        out.append(ln)
+    return out, n
+
+
 def fix_final_order(lines: list[str]) -> tuple[list[str], bool]:
     """[filter_local] 里 FINAL 必须是最后一条。
 
@@ -429,6 +448,15 @@ def split_sections(lines: list[str]) -> list[tuple[str | None, list[str]]]:
     return chunks
 
 
+# 空 section 的提示，避免用户更新后一脸茫然
+SECTION_HINTS = {
+    "server_remote": [
+        "# ⚠️ 本段为空的：节点订阅需要你自己填，本仓库不托管任何节点。",
+        "# ⚠️ 远程配置每次更新会整段覆盖，更新后节点若消失，请在这里重新添加订阅。",
+    ],
+}
+
+
 def inject_additions(lines: list[str]) -> tuple[list[str], int]:
     """把 config/additions.json 里的额外资源插入对应 section。
 
@@ -450,6 +478,12 @@ def inject_additions(lines: list[str]) -> tuple[list[str], int]:
         key = header.strip().strip("[]").strip()
         out.append(header)
         items = by_section.get(key, [])
+
+        # 空 section 补一句提示（如 server_remote）
+        hint = SECTION_HINTS.get(key)
+        if hint and not any(ln.strip() and not ln.strip().startswith(("#", ";"))
+                            for ln in body):
+            out.extend(hint)
 
         def render(it: dict) -> str:
             d = DECISION.get(it["url"])
@@ -671,6 +705,44 @@ def write_report(prev: dict | None) -> dict:
                     L.append(f"  - {it['why']}")
         L.append("")
 
+    # 客户端对账表：Qx 里显示条数必须和这里一致，否则就是清单没加载成功
+    fr_counts: list[tuple[str, int]] = []
+    try:
+        conf_lines = open(os.path.join(ROOT, "QuantumultX.conf"), encoding="utf-8").read().splitlines()
+    except OSError:
+        conf_lines = []
+    in_fr = False
+    for ln in conf_lines:
+        s = ln.strip()
+        if s.startswith("["):
+            in_fr = s.startswith("[filter_remote")
+            continue
+        if not in_fr or not s or s[0] in "#;" or "qx-rules-sync" not in s:
+            continue
+        m = re.search(r"tag=([^,]+)", s)
+        tag = m.group(1).strip() if m else "?"
+        rel = s.split(",")[0].strip().split("/main/", 1)[-1]
+        fp = os.path.join(ROOT, rel)
+        cnt = 0
+        if os.path.exists(fp):
+            with open(fp, encoding="utf-8", errors="replace") as f2:
+                for l2 in f2:
+                    t = l2.strip()
+                    if t and t[0] not in "#;":
+                        cnt += 1
+        fr_counts.append((tag, cnt))
+
+    if fr_counts:
+        L += ["## 客户端对账表（排查「国内也走代理」用）", "",
+              "Qx → 风车 → 分流规则 → 下滑到「远程分流」，点开每项看条数。"
+              "**和下表对不上就说明那份清单没加载成功**，对应分流会整体掉到 "
+              "`FINAL,海外服务` 走代理，表现就是「全都走节点、不切组」。", "",
+              "| 远程分流 | 应有条数 |", "|---|---|"]
+        for tag, cnt in fr_counts:
+            L.append(f"| {tag} | **{cnt}** |")
+        L += ["", "> 特别注意 `大陆服务`：它要是显示 0 或远小于上表数字，"
+              "国内站点就会全部走代理。", ""]
+
     if dead:
         L += ["## 失效清单（配置中已注释，不再拖慢 Qx）", "",
               "| 状态 | 类型 | 地址 | 说明 |", "|---|---|---|---|"]
@@ -794,6 +866,9 @@ def main() -> int:
     out, ncase = normalize_policy_case(out)
     if ncase:
         print(f"统一策略名大小写 {ncase} 处")
+    out, nint = normalize_update_interval(out)
+    if nint:
+        print(f"镜像资源刷新周期统一为 1 天：{nint} 处")
     out, nmem = fix_policy_members(out)
     if nmem:
         print(f"移除策略组里的悬空成员 {nmem} 个")

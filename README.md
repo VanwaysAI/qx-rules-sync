@@ -104,9 +104,25 @@ Qx 见到 `p12` 键存在但没值，会以为"用户要用自定义证书"，�
 ^https?:\/\/wrapper\.cyapi\.cn\/v1\/activity\? url echo-response application/json echo-response https://....../caiyun.json
 ```
 
-Qx 的 `echo-response` 只接受**字面量**响应体（或 `data:` URI），不能填 URL。上游把 mock JSON 的地址直接写在响应体位置，Qx 会报「echo-response 需要本机 Data 目录中的正文文件，不能直接引用 URL/URI」，然后**整条规则被忽略**。
+Qx 的 `echo-response` 要么写字面量、要么填 `data:` URI —— 但**只要有 URI 特征就会被拒**（`https://` 和 `data:` 都算），它只认 Qx 沙盒 `Data` 目录里的本地文件。远程配置没有任何办法往用户手机里放文件，所以这类规则**远程无解**。
 
-`fix_echo_response()` 会把那个 JSON 下载下来、base64 编码成 `data:application/json;base64,...` 内联回去，功能保留，警告消失。
+`fix_echo_response()` 的处理是**把整条规则注释掉**（不是改写，是停用）。代价是该 App 的 mock 去广告失效，收益是那个红字报错彻底消失。教训：早先一版把它改成 `data:application/json;base64,...` 试过，一样报错——`data:` 本身就是 URI。
+
+## 排查：国内站点也走代理、策略组不切换
+
+症状：手机上看什么都是走当前选中的那个节点，`海外服务`/`大陆服务` 两个组形同不存在。
+
+Qx 是**顺序匹配、命中即止**：国内域名先由 `大陆服务` 清单命中 → `static=大陆服务, direct` → 直连。所以只要那份清单没加载成功，国内流量就没有任何规则接住，一路掉到 `[filter_local]` 最后一条 `FINAL,海外服务`，全部走代理。
+
+按这个顺序查：
+
+1. **看条数对账**。Qx → 风车 → 分流规则 → 下滑到「远程分流」，点开每项对比 [`reports/STATUS.md`](reports/STATUS.md) 里的**客户端对账表**。`大陆服务` 应为 79978 条。
+   - 显示 0 / 报错 → 链接拿不到（用 `online_check.py` 验）
+   - 显示明显偏少 → 拿到的是被截断的旧缓存，见第 3 条
+2. **看策略组有没有成员**。Qx → 策略 → `海外服务` 里面应该能看到 `优选节点`/`香港服务`/`美国服务`，`优选节点` 里应该有一堆节点。空组 = 节点订阅没配上（`[server_remote]` 是空的，本仓库不托管节点）。
+3. **强制刷新清单**。Qx 的「更新配置」只重新下载**已过期**的资源。本仓库已把所有镜像的 `update-interval` 统一成 86400（1 天），但如果你手上那份旧配置还是 172800（2 天），坏缓存最长要等两天才会被换掉。
+   最快的办法：风车 → 配置文件 → 远程配置 → **删掉这条再重新添加**，资源会全部重下。
+4. **确认 `FINAL` 在最后**。上游原配置把 `FINAL,海外服务` 写在了 `GEOIP,CN, DIRECT` 前面，导致 `GEOIP` 永远不可达。本仓库已把 `FINAL` 移到 `[filter_local]` 末条（`audit.py` 会检查这一点）。
 
 ## 自检脚本
 
@@ -123,6 +139,7 @@ python3 scripts/online_check.py QuantumultX.conf    # 推到 GitHub 后是否真
 
 ## 注意事项
 
+- ⚠️ **更新配置会清空节点订阅**。本仓库的 `[server_remote]` 是空的（不托管任何节点），而 Qx 更新远程配置时是**整段覆盖**。更新后节点若消失，去 `[server_remote]` 把订阅重新加一次就行。`[server_local]` 里的手写单节点同理。
 - **定时任务会被 GitHub 自动暂停**：仓库连续 60 天无提交活动，schedule 会被禁用。每周手动触发一次，或者给仓库随便提个 commit 就行。
 - **定时不完全准点**：GitHub Actions 的 schedule 在高峰期会延迟几分钟到半小时，08:00 的任务可能 08:20 才跑完。
 - **Qx 主配置不自动更新**：子规则和重写会按 `update-interval` 自动拉，但 Qx 的主 profile 需要在 App 里手动点一次「更新」。所以建议你现在配置里启用、之后每周手动更新一次即可。
