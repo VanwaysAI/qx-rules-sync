@@ -516,6 +516,46 @@ def inject_local_safety(lines: list[str]) -> tuple[list[str], int]:
     return out, len(LOCAL_SAFETY)
 
 
+def normalize_main_filter_types(lines: list[str]) -> tuple[list[str], int]:
+    """把主配置 [filter_local] 里的规则类型统一成小写 —— 这是 Qx 官方写法。
+
+    为什么这条最关键：Quantumult X 的规则类型是**区分大小写**的字面量。官方
+    sample.conf 与全部官方文档里只会出现 `final, ...` / `geoip, cn, direct`，
+    从来没有 `FINAL` / `GEOIP`。上游写成了大写，一旦不被识别：
+
+      - `FINAL,海外服务` 整行被丢弃 → 配置文件里**等于没有 final 规则** →
+        Qx 启用它自己的隐式兜底（网络活动里显示 `ALL, PROXY`，`PROXY` 是 Qx
+        三大内置策略 DIRECT/PROXY/REJECT 之一）→ **所有流量都走内置代理**
+      - `GEOIP,CN, direct` 同样被丢弃 → 国内 IP 判断也没了
+
+    这正是「所有流量固定走选中节点、国内也走线路」的成因。
+    """
+    out, n = [], 0
+    section = None
+    for ln in lines:
+        s = ln.strip()
+        if s.startswith("[") and "]" in s:
+            section = s[1:s.index("]")].strip().lower()
+            out.append(ln)
+            continue
+        if section != "filter_local" or not s or s[0] in "#;":
+            out.append(ln)
+            continue
+        parts = [p.strip() for p in s.split(",")]
+        native = RULE_TYPE_ALIAS.get(parts[0].lower())
+        if native is None:
+            out.append(ln)
+            continue
+        parts[0] = native
+        if native == "geoip" and len(parts) >= 2:
+            parts[1] = parts[1].lower()
+        new = ", ".join(parts)
+        if new != s:
+            n += 1
+        out.append(new)
+    return out, n
+
+
 def fix_final_order(lines: list[str]) -> tuple[list[str], bool]:
     """[filter_local] 里 FINAL 必须是最后一条。
 
@@ -1050,6 +1090,9 @@ def main() -> int:
     out, nsafe = inject_local_safety(out)
     if nsafe:
         print(f"注入国内核心兜底规则 {nsafe} 条（不依赖远程清单）")
+    out, ntype = normalize_main_filter_types(out)
+    if ntype:
+        print(f"[filter_local] 规则类型统一为小写 {ntype} 处（FINAL/GEOIP → final/geoip）")
     out, echo_main = fix_echo_response(out)
     ECHO_FIXES.extend(echo_main)
     out, stripped = strip_empty_keys(out)
