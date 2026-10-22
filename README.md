@@ -212,3 +212,26 @@ python3 scripts/online_check.py QuantumultX.conf    # 推到 GitHub 后是否真
 - **定时不完全准点**：GitHub Actions 的 schedule 在高峰期会延迟几分钟到半小时，08:00 的任务可能 08:20 才跑完。
 - **Qx 主配置不自动更新**：子规则和重写会按 `update-interval` 自动拉，但 Qx 的主 profile 需要在 App 里手动点一次「更新」。所以建议你现在配置里启用、之后每周手动更新一次即可。
 - **镜像内容版权归原作者**，本仓库只是可用性中继，不做任何修改（除了改写链接和注释死链）。
+
+## GeoIP 数据库要不要配
+
+**不用。** Qx 自带一份 GeoIP 库，`geoip, cn, direct` 开箱可用——官方 `sample.conf` 里就直接这么写，没有任何前置步骤。
+
+界面上的 MaxMind 许可证是**可选增强**（用你的免费 license key 换成官方最新 GeoLite2 并自动更新），不是使用 `geoip` 规则的前提。
+
+在「风车 → 设置 → 其他设置（Misc Settings）→ GeoLite2」里，可以看到两种填法：
+
+| 方式 | 填什么 | 建议 |
+|---|---|---|
+| `SOURCE` | 一个 `Country.mmdb` 的下载 URL | **优先用这个**，例如 [Hackl0us/GeoIP2-CN](https://github.com/Hackl0us/GeoIP2-CN) 的精简 CN 库 |
+| License Key | MaxMind 账号的免费 license key | 需要注册账号，图省事才用 |
+
+**对本仓库的配置来说，GeoIP 是可选优化，不是必需项**，原因有三：
+
+1. 配置里 `geoip` 只出现 1 处（`[filter_local]` 的 `geoip, cn, direct`）
+2. `大陆服务` 清单里已有 **6302 条 `ip-cidr`** 国内网段规则，是 GeoIP 的等价替代
+3. 还有 79978 条域名规则兜着，国内流量不依赖 IP 判断
+
+什么时候才值得配：发现某些国内 IP 段被误判成国外、走了代理（表现为个别国内 App 偶发变慢）。这时换个更新的库有意义，否则不用管。
+
+**另外这个设置存在 App 里，不在配置文件里**，所以更新远程配置不会丢，不用每次重填。
