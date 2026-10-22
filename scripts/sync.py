@@ -241,6 +241,66 @@ def known_policies(conf_lines: list[str]) -> set[str]:
     return groups | POLICY_BUILTIN
 
 
+RULE_TYPE_ALIAS = {
+    "domain": "host",
+    "domain-suffix": "host-suffix",
+    "domain-keyword": "host-keyword",
+    "host": "host",
+    "host-suffix": "host-suffix",
+    "host-keyword": "host-keyword",
+    "ip-cidr": "ip-cidr",
+    "ip": "ip-cidr",
+    "ip6-cidr": "ip6-cidr",
+    "ip-cidr6": "ip6-cidr",
+    "geoip": "geoip",
+    "ip-asn": "ip-asn",
+    "user-agent": "user-agent",
+    "final": "final",
+    "dest-port": "dest-port",
+    "src-ip": "src-ip",
+}
+
+
+def normalize_rule_types(path: str) -> tuple[int, int]:
+    """统一清单里的规则类型：转小写，并把 Surge 专有的 domain-* 映射成 Qx 的 host-*。
+
+    Qx 原生规则类型是小写。Mainland.list 里 69235 条写成 `HOST-SUFFIX`（大写）、
+    只有 18 条小写，同一份文件混着来。解析器一旦整体拒收，这张 6.9 万条的
+    国内直连表就等于没加载 —— 所有国内流量掉到兜底组走代理，而 Qx 界面上
+    未必报错，是最难查的一类故障。
+
+    返回 (转换条数, 被注释掉的未知类型条数)。
+    """
+    full = os.path.join(ROOT, path)
+    if not os.path.exists(full):
+        return 0, 0
+    raw = open(full, encoding="utf-8", errors="replace").read()
+    out, conv, bad = [], 0, 0
+    for ln in raw.splitlines():
+        s = ln.strip()
+        if not s or s[0] in "#;":
+            out.append(ln)
+            continue
+        head, sep, tail = s.partition(",")
+        if not sep:
+            out.append(ln)
+            continue
+        t = head.strip().lower()
+        native = RULE_TYPE_ALIAS.get(t)
+        if native is None:
+            out.append("# [qx-sync 未知规则类型] " + s)
+            bad += 1
+            continue
+        new = native + "," + tail if native != head.strip() else ln
+        if new != ln:
+            conv += 1
+        out.append(new)
+    if conv or bad:
+        with open(full, "w", encoding="utf-8") as f:
+            f.write("\n".join(out) + "\n")
+    return conv, bad
+
+
 def sanitize_filter_list(path: str, known: set[str]) -> tuple[int, list[str]]:
     """把引用「不存在的策略」的规则注释掉。
 
@@ -282,6 +342,39 @@ def sanitize_filter_list(path: str, known: set[str]) -> tuple[int, list[str]]:
 
 
 DEAD_MEMBERS = {"proxy", "Proxy", "PROXY"}
+
+# 兜底链上的策略组只保留「一定非空」的成员。
+# 原因：`FINAL,海外服务` 是整个分流的最后一道闸门。海外服务的成员里
+# `香港服务`/`美国服务` 是 url-latency-benchmark + 正则，如果用户的订阅里
+# 没有港/美节点，这两个组就是空的；一旦兜底组因此失效，Qx 会退回它自己的
+# 默认策略（网络活动里显示成 `ALL, PROXY`），所有流量——包括国内——都走
+# 当前选中节点。用户看到的就是「完全不切组、国内也走线路」。
+# `优选节点` 的正则是 `^(?!.*网易云)`，匹配所有非网易云节点，必定非空。
+HARDEN_STATIC = {
+    "海外服务": "优选节点",
+    "油管服务": "优选节点",
+}
+
+
+def harden_policy_groups(lines: list[str]) -> tuple[list[str], list[str]]:
+    """把兜底用的 static 组收缩成单一、必然非空的成员。"""
+    out, changed = [], []
+    for ln in lines:
+        s = ln.strip()
+        if s.startswith("static="):
+            name = s[len("static="):].split(",", 1)[0].strip()
+            want = HARDEN_STATIC.get(name)
+            if want:
+                tail = ""
+                for seg in s.split(","):
+                    if seg.strip().startswith("img-url="):
+                        tail = ", " + seg.strip()
+                new = f"static={name}, {want}{tail}"
+                if new != s:
+                    changed.append(f"{s} → {new}")
+                    ln = new
+        out.append(ln)
+    return out, changed
 
 
 def fix_policy_members(lines: list[str]) -> tuple[list[str], int]:
@@ -342,6 +435,85 @@ def normalize_update_interval(lines: list[str], seconds: int = 86400) -> tuple[l
             ln = new
         out.append(ln)
     return out, n
+
+
+# 写进 [filter_local] 的国内核心兜底。
+# 为什么要有：`大陆服务` 是一份 2.99MB / 7.9 万条的远程清单，手机端下载失败
+# 或解析失败时不会报错，国内流量就直接掉到 FINAL 走代理（微信、iCloud 这类
+# 高频应用首当其冲）。这几条规则体积极小、不依赖任何远程资源，覆盖了绝大
+# 多数国人日常流量，等于给分流系统留了一条不会断的底线。
+LOCAL_SAFETY = [
+    "host-suffix, qq.com, direct",
+    "host-suffix, weixin.com, direct",
+    "host-suffix, wechat.com, direct",
+    "host-suffix, weixinbridge.com, direct",
+    "host-suffix, gtimg.com, direct",
+    "host-suffix, qpic.cn, direct",
+    "host-suffix, qlogo.cn, direct",
+    "host-suffix, tencent.com, direct",
+    "host-suffix, tencent-cloud.com, direct",
+    "host-suffix, myqcloud.com, direct",
+    "host-suffix, weiyun.com, direct",
+    "host-suffix, aliyun.com, direct",
+    "host-suffix, alipay.com, direct",
+    "host-suffix, taobao.com, direct",
+    "host-suffix, tmall.com, direct",
+    "host-suffix, jd.com, direct",
+    "host-suffix, baidu.com, direct",
+    "host-suffix, bdstatic.com, direct",
+    "host-suffix, bilibili.com, direct",
+    "host-suffix, hdslb.com, direct",
+    "host-suffix, zhihu.com, direct",
+    "host-suffix, weibo.com, direct",
+    "host-suffix, douyin.com, direct",
+    "host-suffix, amemv.com, direct",
+    "host-suffix, snssdk.com, direct",
+    "host-suffix, icloud.com.cn, direct",
+    "host-suffix, apple.com.cn, direct",
+    "host-suffix, meituan.com, direct",
+    "host-suffix, 12306.cn, direct",
+    "host-suffix, gov.cn, direct",
+]
+
+
+def inject_local_safety(lines: list[str]) -> tuple[list[str], int]:
+    """把国内核心兜底插到 [filter_local] 里 FINAL 之前（若无 FINAL 则放段末）。
+
+    注意：必须在 fix_final_order 之前调用——那个函数随后会把 FINAL 统一挪到
+    本段最后一条真实规则之后，两者配合的结果就是「兜底规则 → FINAL」。""" 
+    # 找 [filter_local] 的区间
+    begin = end = None
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("[") and "]" in s:
+            name = s[1:s.index("]")].strip()
+            if name == "filter_local" and begin is None:
+                begin = i + 1
+            elif begin is not None and end is None:
+                end = i
+    if begin is None:
+        return lines, 0
+    if end is None:
+        end = len(lines)
+
+    # FINAL 之前插入；没有 FINAL 就插在最后一条真实规则之后
+    insert_at, last_rule = None, None
+    for i in range(begin, end):
+        s = lines[i].strip()
+        if not s or s[0] in "#;":
+            continue
+        if s.lower().startswith("final"):
+            insert_at = i
+            break
+        last_rule = i
+    if insert_at is None:
+        if last_rule is None:
+            return lines, 0
+        insert_at = last_rule + 1
+
+    block = ["# --- 国内核心兜底（不依赖远程清单，见 sync.py LOCAL_SAFETY）---"] + LOCAL_SAFETY
+    out = lines[:insert_at] + block + lines[insert_at:]
+    return out, len(LOCAL_SAFETY)
 
 
 def fix_final_order(lines: list[str]) -> tuple[list[str], bool]:
@@ -741,7 +913,10 @@ def write_report(prev: dict | None) -> dict:
         for tag, cnt in fr_counts:
             L.append(f"| {tag} | **{cnt}** |")
         L += ["", "> 特别注意 `大陆服务`：它要是显示 0 或远小于上表数字，"
-              "国内站点就会全部走代理。", ""]
+              "国内站点就会全部走代理。", "",
+              "> 另外看「网络活动」里每条连接第三行的匹配标识：显示 `ALL, PROXY` "
+              "表示**一条规则都没命中**，Qx 掉到了自己的默认策略；"
+              "显示 `FINAL, 海外服务` 才是兜底正常工作。", ""]
 
     if dead:
         L += ["## 失效清单（配置中已注释，不再拖慢 Qx）", "",
@@ -838,6 +1013,21 @@ def main() -> int:
 
     # Phase 3.5：清理远程规则清单里引用不存在策略的行
     # 这类行最坏会让整份清单加载失败，导致国内直连规则全部失效
+    total_conv = total_unknown = 0
+    for d in ITEMS:
+        src = d.get("src")
+        if d["action"] not in ("mirrored", "replaced") or not src:
+            continue
+        if not src.endswith((".list", ".txt")):
+            continue
+        c, u = normalize_rule_types(mirror_path(src))
+        total_conv += c
+        total_unknown += u
+    if total_conv:
+        print(f"规则类型统一为小写 {total_conv} 条")
+    if total_unknown:
+        print(f"注释掉未知规则类型 {total_unknown} 条")
+
     known = known_policies(lines)
     total_bad = 0
     for d in ITEMS:
@@ -857,6 +1047,9 @@ def main() -> int:
     # Phase 4：生成主配置
     out, dropped = rewrite_lines(lines)
     out, added = inject_additions(out)
+    out, nsafe = inject_local_safety(out)
+    if nsafe:
+        print(f"注入国内核心兜底规则 {nsafe} 条（不依赖远程清单）")
     out, echo_main = fix_echo_response(out)
     ECHO_FIXES.extend(echo_main)
     out, stripped = strip_empty_keys(out)
@@ -872,6 +1065,9 @@ def main() -> int:
     out, nmem = fix_policy_members(out)
     if nmem:
         print(f"移除策略组里的悬空成员 {nmem} 个")
+    out, hardened = harden_policy_groups(out)
+    if hardened:
+        print(f"兜底策略组收缩为必然非空成员 {len(hardened)} 处")
     out, moved = fix_final_order(out)
     if moved:
         print("FINAL 已移到 [filter_local] 末尾（原位置导致其后规则永不命中）")

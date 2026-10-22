@@ -407,7 +407,7 @@ host-suffix, pv.xcar.com.cn, reject
 # host-suffix, newton-api.ele.me, reject
 
 # > 阿里云
-IP-CIDR, 203.107.1.1/24, reject
+ip-cidr, 203.107.1.1/24, reject
 
 # > 爱奇艺
 host, api.iqiyi.com, reject
@@ -450,11 +450,11 @@ host-suffix, noxagile.duapp.com, reject
 host-suffix, paopao.iqiyi.com, reject
 host-suffix, policy.video.iqiyi.com, reject
 host-suffix, ifacelog.iqiyi.com, reject
-IP-CIDR, 203.107.63.154/32, reject
-IP-CIDR, 101.227.97.240/32, reject
-IP-CIDR, 101.227.200.11/32, reject
-IP-CIDR, 101.227.200.28/32, reject
-IP-CIDR, 124.192.153.42/32, reject
+ip-cidr, 203.107.63.154/32, reject
+ip-cidr, 101.227.97.240/32, reject
+ip-cidr, 101.227.200.11/32, reject
+ip-cidr, 101.227.200.28/32, reject
+ip-cidr, 124.192.153.42/32, reject
 
 
 
@@ -644,7 +644,7 @@ host, lc.map.baidu.com, reject
 
 # > 百度贴吧
 # 屏蔽域名dns查询
-IP-CIDR, 180.76.76.200/32, reject
+ip-cidr, 180.76.76.200/32, reject
 
 # > 百词斩
 host, advertise.baicizhan.com, reject
@@ -807,7 +807,7 @@ host-suffix, dotcounter.douyutv.com, reject
 
 # > Dr.Peng
 # IP-CIDR, 10.72.25.0/24, reject
-IP-CIDR, 211.161.101.110/32, reject
+ip-cidr, 211.161.101.110/32, reject
 
 # > 叮嗒出行
 host-keyword, image.bianxianmao.com, reject
@@ -908,12 +908,12 @@ host-suffix, byteorge.com, reject
 # 下面两条误杀严重导致懂车帝无法正常使用
 #host-suffix, bytegoofy.com, reject
 #host-suffix, bytedance.com, reject
-IP-CIDR, 49.71.37.101/32, reject
-IP-CIDR, 117.71.105.23/32, reject
-IP-CIDR, 218.94.207.205/32, reject
-IP-CIDR, 117.92.229.188/32, reject
-IP-CIDR, 101.36.166.16/32, reject
-IP-CIDR, 180.96.2.114/32, reject
+ip-cidr, 49.71.37.101/32, reject
+ip-cidr, 117.71.105.23/32, reject
+ip-cidr, 218.94.207.205/32, reject
+ip-cidr, 117.92.229.188/32, reject
+ip-cidr, 101.36.166.16/32, reject
+ip-cidr, 180.96.2.114/32, reject
 
 # > 风行网
 host-suffix, pb.funshion.net.cn, reject
@@ -1107,7 +1107,7 @@ host-suffix, ipengtai.huanqiu.com, reject
 ;host-suffix, applvn.com, reject
 
 # > Huawei AspiegelBot
-IP-CIDR, 114.119.160.0/21, reject
+ip-cidr, 114.119.160.0/21, reject
 
 # > 华为商城
 host-suffix, hiad.vmall.com, reject
@@ -1245,18 +1245,18 @@ host-suffix, iciba.com, reject
 host-suffix, pdl.gionee.com, reject
 
 # > 今日头条
-host-KEYWORD,clk.gentags.net, reject
-host-KEYWORD,dm.pstatp.com, reject
-host-KEYWORD,dm.bytedance.com, reject
-host-KEYWORD,uop.umeng.com, reject
-host-KEYWORD,m.suning.com, reject
-host-KEYWORD,adshare.toutiao.com, reject
-host-KEYWORD,tunion-api.m.taobao.com, reject
-host-KEYWORD,s1.pstatp.com, reject
-host-KEYWORD,s2.pstatp.com, reject
-host-KEYWORD,s3.pstatp.com, reject
-host-KEYWORD,a3.pstatp.com, reject
-host-KEYWORD,a3.bytecdn.cn, reject
+host-keyword,clk.gentags.net, reject
+host-keyword,dm.pstatp.com, reject
+host-keyword,dm.bytedance.com, reject
+host-keyword,uop.umeng.com, reject
+host-keyword,m.suning.com, reject
+host-keyword,adshare.toutiao.com, reject
+host-keyword,tunion-api.m.taobao.com, reject
+host-keyword,s1.pstatp.com, reject
+host-keyword,s2.pstatp.com, reject
+host-keyword,s3.pstatp.com, reject
+host-keyword,a3.pstatp.com, reject
+host-keyword,a3.bytecdn.cn, reject
 host-suffix, ad.toutiao.com, reject
 host-suffix, dm.toutiao.com, reject
 host-suffix, dsp.toutiao.com, reject
@@ -1283,8 +1283,8 @@ host-suffix, ad.3.cn, reject
 host-suffix, jd.c-ptsp.com.cn, reject
 # 屏蔽DNS
 host, dns.jd.com, reject
-IP-CIDR, 101.124.19.122/32, reject
-IP6-CIDR, 2402:db40:5100:1011::5/128, reject
+ip-cidr, 101.124.19.122/32, reject
+ip6-cidr, 2402:db40:5100:1011::5/128, reject
 
 # > 建行生活
 # 内置饿了么外卖弹窗
@@ -1636,10 +1636,10 @@ host-keyword, cm-10-35.getui.com, reject
 host-keyword, c-hzgt2.getui.com, reject
 
 # > 墨迹天气
-host-KEYWORD,me.api.moji.com, reject
-host-KEYWORD,android.bugly.qq.com, reject
-host-KEYWORD,av1.xdrig.com, reject
-host-KEYWORD,adash.man.aliyuncs.com, reject
+host-keyword,me.api.moji.com, reject
+host-keyword,android.bugly.qq.com, reject
+host-keyword,av1.xdrig.com, reject
+host-keyword,adash.man.aliyuncs.com, reject
 host, ad.api.moji.com, reject
 host, adlaunch.moji.com, reject
 host, ads.mojicdn.com, reject
@@ -1831,7 +1831,7 @@ host-suffix, v.gdt.qq.com, reject
 host, amsweb-cdn-gz-1258344696.file.myqcloud.com, reject
 host, wallpaper-1258344696.file.myqcloud.com, reject
 host, xs.gdt.qq.com, reject
-IP-CIDR, 120.222.240.171/32, reject
+ip-cidr, 120.222.240.171/32, reject
 
 # > 蜻蜓FM
 host, ad.qingting.fm, reject
@@ -1917,11 +1917,11 @@ host, soul-ad.soulapp.cn, reject
 host, ad-r.soulapp.cn, reject
 host, ad-reward.soulapp.cn, reject
 host-suffix, cdn.soulapp.cn, reject
-IP-CIDR, 47.56.131.76/32, reject
-IP-CIDR, 47.97.215.55/32, reject
-IP-CIDR, 47.99.42.29/32, reject
-IP-CIDR, 120.27.235.201/32, reject
-IP-CIDR, 121.196.197.147/32, reject
+ip-cidr, 47.56.131.76/32, reject
+ip-cidr, 47.97.215.55/32, reject
+ip-cidr, 47.99.42.29/32, reject
+ip-cidr, 120.27.235.201/32, reject
+ip-cidr, 121.196.197.147/32, reject
 
 # > Snapchat
 host, ads.snapchat.com, reject
@@ -2637,7 +2637,7 @@ host, ads-video-qc.xhscdn.com, reject
 host, t-ads.xiaohongshu.com, reject
 
 # > 小米
-host-KEYWORD, XiaoQiang, reject
+host-keyword, XiaoQiang, reject
 host-suffix, ad.mi.com, reject
 host-suffix, ad1.xiaomi.com, reject
 host-suffix, admob.xiaomi.com, reject
@@ -2726,7 +2726,7 @@ host-suffix, baihemob.com, reject
 host-suffix, ad.bwton.com, reject
 host-suffix, api.wxcjgg.cn, reject
 host-suffix, shunchangzhixing.com, reject
-IP-CIDR, 114.132.165.205/32, reject
+ip-cidr, 114.132.165.205/32, reject
 
 # > 新浪
 host-suffix, ad.sina.com.cn, reject
@@ -2991,15 +2991,15 @@ host-suffix, adx-open-service.youku.com, reject
 host-suffix, rhdc-acs.youku.com, reject
 # host-suffix, cad.youku.com, reject
 # host-suffix, sjarvis.taobao.com, reject
-DOMAIN, httpdns.alicdn.com, reject
-DOMAIN, adsmind.ugdtimg.com, reject
-DOMAIN, amdc.m.youku.com, reject
-DOMAIN, apiv4-iyes.youku.com, reject
+host, httpdns.alicdn.com, reject
+host, adsmind.ugdtimg.com, reject
+host, amdc.m.youku.com, reject
+host, apiv4-iyes.youku.com, reject
 # DOMAIN, iyes.youku.com, reject
 # DOMAIN, mc.atm.youku.com, reject
-DOMAIN, yk-ssp.ad.youku.com, reject
-DOMAIN, ykad-data.youku.com, reject
-DOMAIN, ad.mobile.youku.com, reject
+host, yk-ssp.ad.youku.com, reject
+host, ykad-data.youku.com, reject
+host, ad.mobile.youku.com, reject
 host-suffix, ad.api.3g.tudou.com, reject
 host-suffix, ad.api.3g.youku.com, reject
 host-suffix, ad.api.mobile.youku.com, reject
@@ -3133,15 +3133,15 @@ host-suffix, ggs.myzaker.com, reject
 host-suffix, push-android.myzaker.com, reject
 
 # > 知乎
-USER-AGENT,AVOS*, reject
+user-agent,AVOS*, reject
 host, appcloud.zhihu.com, reject
 host, appcloud2.in.zhihu.com, reject
 host, mqtt.zhihu.com, reject
 host, sugar.zhihu.com, reject
 host, crash2.zhihu.com, reject
 host, 118.89.204.198, reject
-IP-CIDR, 118.89.204.198/32, reject
-IP6-CIDR,2402:4e00:1200:ed00:0:9089:6dac:96b6/128, reject
+ip-cidr, 118.89.204.198/32, reject
+ip6-cidr,2402:4e00:1200:ed00:0:9089:6dac:96b6/128, reject
 
 # > 中关村
 host-suffix, apppv.zol.com.cn, reject
@@ -3164,7 +3164,7 @@ host-suffix, pic.zol-img.com.cn, reject
 host-suffix, api.zol.com, reject
 
 # > 中国移动
-IP-CIDR, 120.240.95.37/32, reject
+ip-cidr, 120.240.95.37/32, reject
 
 # > 中国联通
 host-suffix, m1.ad.10010.com, reject
@@ -3174,8 +3174,8 @@ host, ad.21cn.com, reject
 host, ad.k.21cn.com, reject
 host, admarket.21cn.com, reject
 host, adshows.21cn.com, reject
-IP-CIDR, 122.229.8.47/32, reject
-IP-CIDR, 122.229.29.89/32, reject
+ip-cidr, 122.229.8.47/32, reject
+ip-cidr, 122.229.29.89/32, reject
 
 # > 中信银行
 ;host-suffix, sis.jpush.io, reject
@@ -3610,7 +3610,7 @@ host-suffix, my.mobfox.com, reject
 host-suffix, magicwindow.cn, reject
 
 # Mathtag
-host-KEYWORD, mathtag, reject
+host-keyword, mathtag, reject
 host-suffix, mathtag.com, reject
 host-suffix, pixel.mathtag.com, reject
 host-suffix, sync.mathtag.com, reject
