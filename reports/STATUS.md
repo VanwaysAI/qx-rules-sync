@@ -1,6 +1,6 @@
 # QuantumultX 配置体检报告
 
-- 上次同步：`2026-10-24 10:43:26 +0800`（北京时间）
+- 上次同步：`2026-10-25 10:33:29 +0800`（北京时间）
 - 上游配置：https://raw.githubusercontent.com/Moli-X/Resources/main/Rewrite/QuantumultX.conf
 - 资源总数 **90** ｜ 可用 **83** ｜ 失效 **7**
 
